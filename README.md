@@ -57,11 +57,11 @@ With that being said, I have a suggestion on how to break it smaller parts
    - Set up the project structure.
    - Define the data model for the TODO items (your golang struct).
    - Plan out the API endpoints and overall architecture (exemples of endpoints below)
-    - POST /todo (create a new TODO item)
-    - GET /todo (retrieve all TODO items)
-    - GET /todo/{id} (retrieve a single TODO item by ID)
-    - PUT /todo/{id} (update a TODO item by ID)
-    - DELETE /todo/{id} (delete a TODO item by ID)
+      - POST /todo (create a new TODO item)
+      - GET /todo (retrieve all TODO items)
+      - GET /todo/{id} (retrieve a single TODO item by ID)
+      - PUT /todo/{id} (update a TODO item by ID)
+      - DELETE /todo/{id} (delete a TODO item by ID)
 
 ### **Milestone 2: Basic API Implementation**
    - Implement basic HTTP server (already done as an "Hello World" exemple).
