@@ -17,4 +17,6 @@ https://www.youtube.com/watch?v=7cTpMZdZpzM
 Comecando a executar os primeiros itens do primeiro milestone definido. Criando a estrutura do todo item e buscando entrender melhor atraves de exemplos praticos como uma api funciona, como sua estrutura eh organizada
 
 ### 29 de abril
-Focar em desenvolver, esses primeiros dias nao foram muito produtivos.
+Focando em desenvolver. Hoje inicie a criacao do metodo POST
+
+### 30 de abril
