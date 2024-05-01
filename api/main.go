@@ -10,28 +10,29 @@ import (
 	"os"
 )
 
-const name = "Paulo \"The King\""
+const defaultPort = "3000"
 
 func main() {
-	http.HandleFunc("/hello", hello)
+	// http.HandleFunc("/hello", hello)
+	port := getPort()
 	http.HandleFunc("/todo", TodoEntryPoint)
+	printServerInfo(port)
 
-	if os.Getenv("PORT") == "" {
-		fmt.Printf("missing PORT\n")
-		os.Exit(1)
-	}
-	fmt.Println("listening...")
-
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
 	}
 }
+func getPort() string {
+	port := os.Getenv("PORT")
+	if port == "" {
+		return defaultPort
+	}
+	return port
+}
 
-func hello(res http.ResponseWriter, req *http.Request) {
-	message := fmt.Sprintf("Hello %s\n", name)
-	res.WriteHeader(http.StatusOK) //Status code 200
-	res.Write([]byte(message))
+func printServerInfo(port string) {
+	fmt.Println("API running at http://localhost:" + port + "/todo")
 }
 
 func TodoEntryPoint(res http.ResponseWriter, req *http.Request) {
@@ -44,6 +45,7 @@ func TodoEntryPoint(res http.ResponseWriter, req *http.Request) {
 
 }
 
+// Em api/todo_handler.go
 func CreateTodo(res http.ResponseWriter, req *http.Request) {
 
 	var newTodo todo.Todo
@@ -53,9 +55,26 @@ func CreateTodo(res http.ResponseWriter, req *http.Request) {
 		res.Write([]byte("invalid todo item"))
 		return
 	}
-	newTodo.ID = "1" //implementar um contador
+
+	// TODO: Implement logic to generate ID (e.g., UUID)
+	newTodo.ID = "1"
+	// newTodo.ID = generateID()
+
+	// TODO: Implement logic to store the new Todo item
+	// yourTodoStorageFunction(newTodo)
+
+	// Return success response with the created Todo
 	fmt.Println(newTodo)
-	res.WriteHeader(http.StatusOK)
+	res.WriteHeader(http.StatusCreated) //201 Created
+	res.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(res).Encode(newTodo)
 
+}
+
+const name = "Paulo \"The King\""
+
+func hello(res http.ResponseWriter, req *http.Request) {
+	message := fmt.Sprintf("Hello %s\n", name)
+	res.WriteHeader(http.StatusOK) //Status code 200
+	res.Write([]byte(message))
 }
