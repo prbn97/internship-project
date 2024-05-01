@@ -20,3 +20,23 @@ Comecando a executar os primeiros itens do primeiro milestone definido. Criando 
 Focando em desenvolver. Hoje inicie a criacao do metodo POST
 
 ### 30 de abril
+
+    todo-api/
+    - api/
+        - /main.go
+        - /todo_handler.go
+    - internal/
+        - /todo/
+        - /todo.go
+    - /pkg/
+        - /validation/
+        - /validator.go
+    - /tests/
+        - /todo_handler_test.go
+    - README.md
+    - go.mod
+    - Makefile
+
+
+
+
