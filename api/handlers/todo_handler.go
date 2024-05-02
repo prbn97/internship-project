@@ -14,7 +14,7 @@ func TodoEntryPoint(res http.ResponseWriter, req *http.Request) {
 		CreateTodoHandler(res, req)
 		return
 	} else if req.Method == "GET" {
-		hello(res, req)
+		GetAllTodosHandler(res, req)
 	}
 
 	// GET /todo (retrieve all TODO items)
@@ -25,25 +25,27 @@ func TodoEntryPoint(res http.ResponseWriter, req *http.Request) {
 
 }
 
+var todoList []todo.Todo
+
 func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
 
 	var newTodo todo.Todo
 	err := json.NewDecoder(req.Body).Decode(&newTodo)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
-		res.Write([]byte("invalid todo item"))
+		res.Write([]byte("error generating ToDo Item"))
 		return
 	}
 
 	id, err := generateID()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		res.Write([]byte("error generating unique ID"))
+		res.Write([]byte("error generating  ID"))
 		return
 	}
 	newTodo.ID = id
+	todoList = append(todoList, newTodo)
 
-	// TODO: Implement logic to store the new Todo itemgit
 	// yourTodoStorageFunction(newTodo)
 
 	// Return success response with the created Todo
@@ -66,10 +68,7 @@ func generateID() (string, error) {
 	return id, nil
 }
 
-// make this the GET EndPoint
-func hello(res http.ResponseWriter, req *http.Request) {
-	name := "Paulo \"The King\""
-	message := fmt.Sprintf("Hello %s\n", name)
-	res.WriteHeader(http.StatusOK) //Status code 200
-	res.Write([]byte(message))
+func GetAllTodosHandler(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(res).Encode(todoList)
 }
