@@ -1,6 +1,5 @@
-package todo
+package models
 
-// Todo representa um item da lista de tarefas
 type Todo struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`

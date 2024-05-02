@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/main.go/api/handlers"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,7 +12,7 @@ const defaultPort = "3000"
 func main() {
 	// http.HandleFunc("/hello", hello)
 	port := getPort()
-	http.HandleFunc("/todo", TodoEntryPoint)
+	http.HandleFunc("/", handlers.TodoEntryPoint)
 	printServerInfo(port)
 
 	err := http.ListenAndServe(":"+port, nil)
@@ -29,5 +30,5 @@ func getPort() string {
 }
 
 func printServerInfo(port string) {
-	fmt.Println("API running at http://localhost:" + port + "/todo")
+	fmt.Println("API running at http://localhost:" + port + "/")
 }

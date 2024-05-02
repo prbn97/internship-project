@@ -43,7 +43,6 @@ Helps me alot.
 
 ### 2 de abril
 
-lets finish this week with *Milestone 1* and *Milestone 2* finished
-+ alguma coisa
+lets finish this week with *Milestone 1* and *Milestone 2* finished.
 
 

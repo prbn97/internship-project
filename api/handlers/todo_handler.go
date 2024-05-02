@@ -1,7 +1,7 @@
-package main
+package handlers
 
 import (
-	"api/main.go/internal/todo"
+	todo "api/main.go/models"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -14,11 +14,10 @@ func TodoEntryPoint(res http.ResponseWriter, req *http.Request) {
 	} else if req.Method == "GET" {
 		hello(res, req)
 	}
-	// make now!
+
 	// GET /todo (retrieve all TODO items)
 	// GET /todo/{id} (retrieve a single TODO item by ID)
 
-	// make latter
 	// PUT /todo/{id} (update a TODO item by ID)
 	// DELETE /todo/{id} (delete a TODO item by ID)
 
@@ -36,11 +35,10 @@ func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
 
 	// make now!
 	// TODO: Implement logic to generate ID (e.g., UUID)
-
-	newTodo.ID = "1"
 	// newTodo.ID = generateID()
+	newTodo.ID = "1"
 
-	// TODO: Implement logic to store the new Todo item
+	// TODO: Implement logic to store the new Todo itemgit
 	// yourTodoStorageFunction(newTodo)
 
 	// Return success response with the created Todo
@@ -51,7 +49,7 @@ func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
 
 }
 
-// make this my GET EndPoint
+// make this the GET EndPoint
 func hello(res http.ResponseWriter, req *http.Request) {
 	name := "Paulo \"The King\""
 	message := fmt.Sprintf("Hello %s\n", name)
