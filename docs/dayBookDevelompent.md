@@ -14,12 +14,13 @@ Buscando exemplos de api rest em Go na internet para criar a minha
 https://www.youtube.com/watch?v=7cTpMZdZpzM
 
 ### 27 de abril
-Comecando a executar os primeiros itens do primeiro milestone definido. Criando a estrutura do todo item e buscando entrender melhor atraves de exemplos praticos como uma api funciona, como sua estrutura eh organizada
+Comecando a executar os primeiros itens do primeiro milestone definido. Criando a estrutura do todo item e buscando entrender melhor atraves de exemplos praticos como uma api funciona, como sua estrutura é organizada.
 
 ### 29 de abril
-Focando em desenvolver. Hoje inicie a criacao do metodo POST
+Focus on develompment today. Hoje inicie a criacao do metodo POST
 
 ### 30 de abril
+one structure that chat gpt made for me.
 
     todo-api/
     - api/
@@ -37,6 +38,12 @@ Focando em desenvolver. Hoje inicie a criacao do metodo POST
     - go.mod
     - Makefile
 
+[Find this content](https://www.alura.com.br/conteudo/go-desenvolvendo-api-rest)
+Helps me alot.
 
+### 2 de abril
+
+lets finish this week with *Milestone 1* and *Milestone 2* finished
++ alguma coisa
 
 
