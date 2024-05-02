@@ -2,6 +2,8 @@ package handlers
 
 import (
 	todo "api/main.go/models"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -33,10 +35,13 @@ func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// make now!
-	// TODO: Implement logic to generate ID (e.g., UUID)
-	// newTodo.ID = generateID()
-	newTodo.ID = "1"
+	id, err := generateID()
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write([]byte("error generating unique ID"))
+		return
+	}
+	newTodo.ID = id
 
 	// TODO: Implement logic to store the new Todo itemgit
 	// yourTodoStorageFunction(newTodo)
@@ -47,6 +52,18 @@ func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(res).Encode(newTodo)
 
+}
+
+func generateID() (string, error) {
+	idBytes := make([]byte, 16)
+
+	_, err := rand.Read(idBytes)
+	if err != nil {
+		return "", err
+	}
+	id := hex.EncodeToString(idBytes)
+
+	return id, nil
 }
 
 // make this the GET EndPoint
