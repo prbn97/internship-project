@@ -33,7 +33,7 @@ func printServerInfo(port string) {
 }
 
 // curl --request POST \
-//   --data '{"title":"task title", "description": "task description"}' \
+//   --data '{"title":"task title", "description": "task description"}'\
 //   http://localhost:8080/todo
 
 // curl --request POST \

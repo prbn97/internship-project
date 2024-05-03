@@ -17,6 +17,10 @@ func TodoEntryPoint(res http.ResponseWriter, req *http.Request) {
 			CreateTodoItem(res, req)
 		case "GET":
 			GetAllTodoItem(res, req)
+		case "PUT":
+			fmt.Printf("update todo item by id")
+		case "DELETE":
+			fmt.Printf("delete todo item by id")
 		default:
 			res.WriteHeader(http.StatusMethodNotAllowed)
 			res.Write([]byte("error method not allowed"))
@@ -27,8 +31,6 @@ func TodoEntryPoint(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusNotFound)
 		res.Write([]byte("error endpoint not found"))
 	}
-	// PUT /todo/{id} (update a TODO item by ID)
-	// DELETE /todo/{id} (delete a TODO item by ID)
 
 }
 
@@ -58,7 +60,6 @@ func CreateTodoItem(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Return success response with the created Todo
 	fmt.Println(newTodo)
 	res.WriteHeader(http.StatusCreated) //201 Created
 	res.Header().Set("Content-Type", "application/json")
@@ -67,7 +68,7 @@ func CreateTodoItem(res http.ResponseWriter, req *http.Request) {
 }
 
 func GetAllTodoItem(res http.ResponseWriter, req *http.Request) {
-	// Carrega a lista de todo items do arquivo JSON
+
 	todoList, err := todo.LoadListFromFile("todos.json")
 	if err != nil {
 		fmt.Println("error when loading the list of todo items:", err)
