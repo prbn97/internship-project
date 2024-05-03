@@ -1,33 +1,25 @@
 package main
 
 import (
-	"api/main.go/api/handlers"
 	"fmt"
 	"net/http"
 	"os"
 )
 
-const defaultPort = "8080"
+const name = "Paulo \"The King\""
 
 func main() {
-	port := getPort()
-	http.HandleFunc("/", handlers.TodoEntryPoint)
-	printServerInfo(port)
+	http.HandleFunc("/hello", hello)
 
-	err := http.ListenAndServe(":"+port, nil)
+	fmt.Println("listening...")
+	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func getPort() string {
-	port := os.Getenv("PORT")
-	if port == "" {
-		return defaultPort
-	}
-	return port
-}
-
-func printServerInfo(port string) {
-	fmt.Println("API running at http://localhost:" + port + "/")
+func hello(res http.ResponseWriter, req *http.Request) {
+	message := fmt.Sprintf("Hello %s\n", name)
+	res.WriteHeader(http.StatusOK) //Status code 200
+	res.Write([]byte(message))
 }
