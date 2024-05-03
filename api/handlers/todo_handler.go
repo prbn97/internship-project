@@ -2,12 +2,12 @@ package handlers
 
 import (
 	todo "api/main.go/models"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
+
+var todoList []todo.Todo
 
 func TodoEntryPoint(res http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
@@ -17,15 +17,11 @@ func TodoEntryPoint(res http.ResponseWriter, req *http.Request) {
 		GetAllTodosHandler(res, req)
 	}
 
-	// GET /todo (retrieve all TODO items)
 	// GET /todo/{id} (retrieve a single TODO item by ID)
-
 	// PUT /todo/{id} (update a TODO item by ID)
 	// DELETE /todo/{id} (delete a TODO item by ID)
 
 }
-
-var todoList []todo.Todo
 
 func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
 
@@ -37,7 +33,7 @@ func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	id, err := generateID()
+	id, err := todo.GenerateID()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		res.Write([]byte("error generating  ID"))
@@ -46,7 +42,12 @@ func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
 	newTodo.ID = id
 	todoList = append(todoList, newTodo)
 
-	// yourTodoStorageFunction(newTodo)
+	err = todo.SaveListOnFile(todoList, "todos.json")
+	if err != nil {
+		fmt.Println("error saving list of ToDo items", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	// Return success response with the created Todo
 	fmt.Println(newTodo)
@@ -56,19 +57,14 @@ func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
 
 }
 
-func generateID() (string, error) {
-	idBytes := make([]byte, 16)
-
-	_, err := rand.Read(idBytes)
-	if err != nil {
-		return "", err
-	}
-	id := hex.EncodeToString(idBytes)
-
-	return id, nil
-}
-
 func GetAllTodosHandler(res http.ResponseWriter, req *http.Request) {
+	// Carrega a lista de todo items do arquivo JSON
+	todoList, err := todo.LoadListFromFile("todos.json")
+	if err != nil {
+		fmt.Println("Erro ao carregar a lista de todo items:", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	res.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(res).Encode(todoList)
 }

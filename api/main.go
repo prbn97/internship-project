@@ -9,6 +9,11 @@ import (
 
 const defaultPort = "3000"
 
+// curl --header "Content-Type: application/json" \
+//   --request POST \
+//   --data '{"title":"Comprar leite", "description": "Ir ao mercado e comprar leite"}' \
+//   http://localhost:8080/todo
+
 func main() {
 	// http.HandleFunc("/hello", hello)
 	port := getPort()
