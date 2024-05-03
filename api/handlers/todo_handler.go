@@ -5,25 +5,34 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 var todoList []todo.Todo
 
 func TodoEntryPoint(res http.ResponseWriter, req *http.Request) {
-	if req.Method == "POST" {
-		CreateTodoHandler(res, req)
-		return
-	} else if req.Method == "GET" {
-		GetAllTodosHandler(res, req)
+	if req.URL.Path == "/todo" {
+		switch req.Method {
+		case "POST":
+			CreateTodoItem(res, req)
+		case "GET":
+			GetAllTodoItem(res, req)
+		default:
+			res.WriteHeader(http.StatusMethodNotAllowed)
+			res.Write([]byte("error method not allowed"))
+		}
+	} else if strings.HasPrefix(req.URL.Path, "/todo/") && req.Method == "GET" {
+		GetTodoItemByID(res, req)
+	} else {
+		res.WriteHeader(http.StatusNotFound)
+		res.Write([]byte("error endpoint not found"))
 	}
-
-	// GET /todo/{id} (retrieve a single TODO item by ID)
 	// PUT /todo/{id} (update a TODO item by ID)
 	// DELETE /todo/{id} (delete a TODO item by ID)
 
 }
 
-func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
+func CreateTodoItem(res http.ResponseWriter, req *http.Request) {
 
 	var newTodo todo.Todo
 	err := json.NewDecoder(req.Body).Decode(&newTodo)
@@ -57,14 +66,50 @@ func CreateTodoHandler(res http.ResponseWriter, req *http.Request) {
 
 }
 
-func GetAllTodosHandler(res http.ResponseWriter, req *http.Request) {
+func GetAllTodoItem(res http.ResponseWriter, req *http.Request) {
 	// Carrega a lista de todo items do arquivo JSON
 	todoList, err := todo.LoadListFromFile("todos.json")
 	if err != nil {
-		fmt.Println("Erro ao carregar a lista de todo items:", err)
+		fmt.Println("error when loading the list of todo items:", err)
 		res.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	res.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(res).Encode(todoList)
+}
+
+func GetTodoItemByID(res http.ResponseWriter, req *http.Request) {
+	parts := strings.Split(req.URL.Path, "/")
+
+	if len(parts) < 3 {
+		res.WriteHeader(http.StatusBadRequest)
+		res.Write([]byte("error missing ID"))
+		return
+	}
+
+	id := parts[2]
+
+	todoList, err := todo.LoadListFromFile("todos.json")
+	if err != nil {
+		fmt.Println("error when loading the list of ToDo items:", err)
+		res.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var foundTodo *todo.Todo
+	for _, todo := range todoList {
+		if todo.ID == id {
+			foundTodo = &todo
+			break
+		}
+	}
+
+	if foundTodo == nil {
+		res.WriteHeader(http.StatusNotFound)
+		res.Write([]byte("error ToDo Item not find "))
+		return
+	}
+
+	res.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(res).Encode(foundTodo)
 }
