@@ -31,14 +31,3 @@ func getPort() string {
 func printServerInfo(port string) {
 	fmt.Println("API running at http://localhost:" + port + "/")
 }
-
-// curl --request POST \
-//   --data '{"title":"task title", "description": "task description"}'\
-//   http://localhost:8080/todo
-
-// curl --request POST \
-//   --data '{"title":"task title", "description": "remvover esse"}' \
-//   http://localhost:8080/todo
-
-// curl --request GET \
-//   http://localhost:8080/todo/d75e8f8c649d2fc1879c2a645dd582d1
