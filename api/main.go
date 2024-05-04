@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/main.go/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,9 +11,9 @@ import (
 )
 
 var (
-	listUser_RegularExpression   = regexp.MustCompile(`^\/users[\/]*$`)   // /user/
-	getUser_RegularExpression    = regexp.MustCompile(`^\/users\/(\d+)$`) // /user/{id}
-	createUser_RegularExpression = regexp.MustCompile(`^\/users[\/]*$`)   // /post/
+	listUser_RegularExpression   = regexp.MustCompile(`^\/users[\/]*$`)
+	getUser_RegularExpression    = regexp.MustCompile(`^\/users\/(\d+)$`)
+	createUser_RegularExpression = regexp.MustCompile(`^\/users[\/]*$`)
 )
 
 type user struct {
@@ -41,7 +42,7 @@ func (h *userHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		h.Create(res, req)
 		return
 	default:
-		notFound(res, req)
+		utils.NotFound(res, req)
 	}
 
 }
@@ -56,7 +57,7 @@ func (h *userHandler) List(res http.ResponseWriter, req *http.Request) {
 	h.store.RUnlock()
 	jsonBytes, err := json.Marshal(users)
 	if err != nil {
-		internalServerError(res, req)
+		utils.InternalServerError(res, req)
 		return
 	}
 
@@ -67,20 +68,20 @@ func (h *userHandler) List(res http.ResponseWriter, req *http.Request) {
 func (h *userHandler) Get(res http.ResponseWriter, req *http.Request) {
 	matches := getUser_RegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 {
-		notFound(res, req)
+		utils.NotFound(res, req)
 		return
 	}
 	h.store.RLock()
 	user, ok := h.store.m[matches[1]]
 	h.store.RUnlock()
 	if !ok {
-		notFound(res, req)
+		utils.NotFound(res, req)
 		return
 	}
 
 	jsonBytes, err := json.Marshal(user)
 	if err != nil {
-		internalServerError(res, req)
+		utils.InternalServerError(res, req)
 		return
 	}
 
@@ -89,44 +90,32 @@ func (h *userHandler) Get(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *userHandler) Create(res http.ResponseWriter, req *http.Request) {
+	// decodes the JSON data from the request body into a user struct.
+	// This POST assumes that the request contains JSON data representing a user.
+
 	u := user{}
 	if err := json.NewDecoder(req.Body).Decode(&u); err != nil {
-		badRequest(res, req)
+		utils.BadRequest(res, req)
 		return
 	}
-	// Generate a new ID as a string representation of an integer
-	newID := strconv.Itoa(len(h.store.m) + 1)
+
+	newID := strconv.Itoa(len(h.store.m) + 1) // Generate a new ID as an integer
 	u.ID = newID
 
 	h.store.Lock()
-	h.store.m[u.ID] = u
+	h.store.m[u.ID] = u // adds the new user to the datastore
 	h.store.Unlock()
 
 	res.Header().Set("Content-Type", "application/json")
 
 	jsonBytes, err := json.Marshal(u)
 	if err != nil {
-		internalServerError(res, req)
+		utils.InternalServerError(res, req)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
 	res.Write(jsonBytes)
 
-}
-
-func badRequest(res http.ResponseWriter, req *http.Request) {
-	res.WriteHeader(http.StatusBadRequest)
-	res.Write([]byte(`{"error": "bad request"}`))
-}
-
-func notFound(res http.ResponseWriter, req *http.Request) {
-	res.WriteHeader(http.StatusNotFound)
-	res.Write([]byte(`{"error": "not found"}`))
-}
-
-func internalServerError(res http.ResponseWriter, req *http.Request) {
-	res.WriteHeader(http.StatusNotFound)
-	res.Write([]byte(`{"error": "internal server error"}`))
 }
 
 func main() {
@@ -138,7 +127,7 @@ func main() {
 	fmt.Println("listening...")
 
 	mux.Handle("/users/", userH) // /users/{id}
-	mux.Handle("/users", userH)  // /users/{id}
+	mux.Handle("/users", userH)  // /users
 	http.ListenAndServe("localhost:8080", mux)
 
 }
