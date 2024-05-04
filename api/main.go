@@ -41,6 +41,9 @@ func (h *userHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	case req.Method == http.MethodPost && createUser_RegularExpression.MatchString(req.URL.Path):
 		h.Create(res, req)
 		return
+	case req.Method == http.MethodPut && getUser_RegularExpression.MatchString(req.URL.Path):
+		h.Update(res, req)
+		return
 	default:
 		utils.NotFound(res, req)
 	}
@@ -53,14 +56,13 @@ func (h *userHandler) List(res http.ResponseWriter, req *http.Request) {
 	for _, user := range h.store.m {
 		users = append(users, user)
 	}
-
 	h.store.RUnlock()
+
 	jsonBytes, err := json.Marshal(users)
 	if err != nil {
 		utils.InternalServerError(res, req)
 		return
 	}
-
 	res.WriteHeader(http.StatusOK)
 	res.Write(jsonBytes)
 }
@@ -106,8 +108,6 @@ func (h *userHandler) Create(res http.ResponseWriter, req *http.Request) {
 	h.store.m[u.ID] = u // adds the new user to the datastore
 	h.store.Unlock()
 
-	res.Header().Set("Content-Type", "application/json")
-
 	jsonBytes, err := json.Marshal(u)
 	if err != nil {
 		utils.InternalServerError(res, req)
@@ -116,6 +116,50 @@ func (h *userHandler) Create(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusOK)
 	res.Write(jsonBytes)
 
+}
+
+func (h *userHandler) Update(res http.ResponseWriter, req *http.Request) {
+	// Extrair o ID do usuário da URL
+	matches := getUser_RegularExpression.FindStringSubmatch(req.URL.Path)
+	if len(matches) < 2 {
+		utils.NotFound(res, req)
+		return
+	}
+	userID := matches[1]
+
+	// Verificar se o usuário existe
+	h.store.Lock()
+	defer h.store.Unlock()
+	u, ok := h.store.m[userID]
+	if !ok {
+		utils.NotFound(res, req)
+		return
+	}
+
+	// Decodificar o corpo da solicitação para obter os novos dados do usuário
+	var updatedUser user
+	if err := json.NewDecoder(req.Body).Decode(&updatedUser); err != nil {
+		utils.BadRequest(res, req)
+		return
+	}
+
+	// Atualizar os campos relevantes do usuário
+	if updatedUser.Name != "" {
+		u.Name = updatedUser.Name
+	}
+
+	// Atualizar o usuário na memória
+	h.store.m[userID] = u
+
+	// Responder com o usuário atualizado
+	res.Header().Set("Content-Type", "application/json")
+	jsonBytes, err := json.Marshal(u)
+	if err != nil {
+		utils.InternalServerError(res, req)
+		return
+	}
+	res.WriteHeader(http.StatusOK)
+	res.Write(jsonBytes)
 }
 
 func main() {
