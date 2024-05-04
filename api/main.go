@@ -2,17 +2,19 @@ package main
 
 import (
 	"api/main.go/utils"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
-	"strconv"
+	"strings"
 	"sync"
 )
 
 var (
 	listUser_RegularExpression   = regexp.MustCompile(`^\/users[\/]*$`)
-	getUser_RegularExpression    = regexp.MustCompile(`^\/users\/(\d+)$`)
+	getUser_RegularExpression    = regexp.MustCompile(`^\/users\/([a-zA-Z0-9]+)$`)
 	createUser_RegularExpression = regexp.MustCompile(`^\/users[\/]*$`)
 )
 
@@ -43,6 +45,9 @@ func (h *userHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	case req.Method == http.MethodPut && getUser_RegularExpression.MatchString(req.URL.Path):
 		h.Update(res, req)
+		return
+	case req.Method == http.MethodDelete && getUser_RegularExpression.MatchString(req.URL.Path):
+		h.Delete(res, req)
 		return
 	default:
 		utils.NotFound(res, req)
@@ -101,7 +106,12 @@ func (h *userHandler) Create(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	newID := strconv.Itoa(len(h.store.m) + 1) // Generate a new ID as an integer
+	newID, err := generateID(20) // Generate a new ID as an integer
+	if err != nil {
+		utils.InternalServerError(res, req)
+		return
+	}
+
 	u.ID = newID
 
 	h.store.Lock()
@@ -117,42 +127,62 @@ func (h *userHandler) Create(res http.ResponseWriter, req *http.Request) {
 	res.Write(jsonBytes)
 
 }
+func generateID(length int) (string, error) {
+	// Calcula o número de bytes necessário para gerar o ID
+	numBytes := length / 2
+	if length%2 != 0 {
+		numBytes++
+	}
+
+	// Gera bytes aleatórios usando crypto/rand
+	randomBytes := make([]byte, numBytes)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		return "", err
+	}
+
+	// Codifica os bytes aleatórios em uma string hexadecimal
+	id := hex.EncodeToString(randomBytes)
+
+	// Ajusta o tamanho do ID se necessário
+	if len(id) > length {
+		id = id[:length]
+	} else if len(id) < length {
+		// Se o ID gerado for menor que o tamanho especificado,
+		// preenche o restante com caracteres '0'
+		id += strings.Repeat("0", length-len(id))
+	}
+
+	return id, nil
+}
 
 func (h *userHandler) Update(res http.ResponseWriter, req *http.Request) {
-	// Extrair o ID do usuário da URL
 	matches := getUser_RegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 {
 		utils.NotFound(res, req)
 		return
 	}
-	userID := matches[1]
 
-	// Verificar se o usuário existe
+	userID := matches[1]
 	h.store.Lock()
-	defer h.store.Unlock()
 	u, ok := h.store.m[userID]
+	h.store.Unlock()
 	if !ok {
 		utils.NotFound(res, req)
 		return
 	}
 
-	// Decodificar o corpo da solicitação para obter os novos dados do usuário
 	var updatedUser user
+	// Decodificar o corpo da solicitação para obter os novos dados do usuário
 	if err := json.NewDecoder(req.Body).Decode(&updatedUser); err != nil {
 		utils.BadRequest(res, req)
 		return
 	}
-
-	// Atualizar os campos relevantes do usuário
 	if updatedUser.Name != "" {
 		u.Name = updatedUser.Name
 	}
-
-	// Atualizar o usuário na memória
 	h.store.m[userID] = u
 
-	// Responder com o usuário atualizado
-	res.Header().Set("Content-Type", "application/json")
 	jsonBytes, err := json.Marshal(u)
 	if err != nil {
 		utils.InternalServerError(res, req)
@@ -160,6 +190,26 @@ func (h *userHandler) Update(res http.ResponseWriter, req *http.Request) {
 	}
 	res.WriteHeader(http.StatusOK)
 	res.Write(jsonBytes)
+}
+
+func (h *userHandler) Delete(res http.ResponseWriter, req *http.Request) {
+	matches := getUser_RegularExpression.FindStringSubmatch(req.URL.Path)
+	if len(matches) < 2 {
+		utils.NotFound(res, req)
+		return
+	}
+
+	userID := matches[1]
+	h.store.Lock()
+	_, ok := h.store.m[userID]
+	h.store.Unlock()
+	if !ok {
+		utils.NotFound(res, req)
+		return
+	}
+
+	delete(h.store.m, userID)
+	res.WriteHeader(http.StatusOK)
 }
 
 func main() {
