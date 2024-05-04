@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 	"sync"
 )
 
 var (
-	createUser_RegularExpression = regexp.MustCompile(`^\/users[\/]*$`)   // /post/
 	listUser_RegularExpression   = regexp.MustCompile(`^\/users[\/]*$`)   // /user/
 	getUser_RegularExpression    = regexp.MustCompile(`^\/users\/(\d+)$`) // /user/{id}
+	createUser_RegularExpression = regexp.MustCompile(`^\/users[\/]*$`)   // /post/
 )
 
 type user struct {
@@ -93,6 +94,10 @@ func (h *userHandler) Create(res http.ResponseWriter, req *http.Request) {
 		badRequest(res, req)
 		return
 	}
+	// Generate a new ID as a string representation of an integer
+	newID := strconv.Itoa(len(h.store.m) + 1)
+	u.ID = newID
+
 	h.store.Lock()
 	h.store.m[u.ID] = u
 	h.store.Unlock()
@@ -127,14 +132,7 @@ func internalServerError(res http.ResponseWriter, req *http.Request) {
 func main() {
 	mux := http.NewServeMux()
 	userH := &userHandler{
-		store: &datastore{
-			m: map[string]user{
-				"1": {ID: "171", Name: "bob"},
-				"2": {ID: "210", Name: "karen"},
-				"3": {ID: "343", Name: "jack"},
-			},
-			RWMutex: &sync.RWMutex{},
-		},
+		store: &datastore{m: map[string]user{}, RWMutex: &sync.RWMutex{}},
 	}
 	fmt.Println("API running at http://localhost:8080/users")
 	fmt.Println("listening...")
@@ -144,15 +142,3 @@ func main() {
 	http.ListenAndServe("localhost:8080", mux)
 
 }
-
-// func getPort() string {
-// 	port := os.Getenv("PORT")
-// 	if port == "" {
-// 		return "8080"
-// 	}
-// 	return port
-// }
-
-// func printServerInfo(port string) {
-// 	fmt.Println("API running at http://localhost:" + port + "/")
-// }
