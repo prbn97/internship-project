@@ -144,25 +144,33 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 
 	todoID := matches[1]
 	h.store.Lock()
-	u, ok := h.store.m[todoID]
-	h.store.Unlock()
+	defer h.store.Unlock()
+
+	todoItem, ok := h.store.m[todoID]
 	if !ok {
 		utils.NotFound(res, req)
 		return
 	}
 
+	// Decodificar o corpo da solicitação para obter os novos dados do todo item
 	var updatedTodo models.Todo
-	// Decodificar o corpo da solicitação para obter os novos dados do usuário
 	if err := json.NewDecoder(req.Body).Decode(&updatedTodo); err != nil {
 		utils.BadRequest(res, req)
 		return
 	}
+	// Atualizar os campos do todo item, se fornecidos
 	if updatedTodo.Title != "" {
-		u.Title = updatedTodo.Title
+		todoItem.Title = updatedTodo.Title
 	}
-	h.store.m[todoID] = u
+	if updatedTodo.Description != "" {
+		todoItem.Description = updatedTodo.Description
+	}
+	if updatedTodo.Completed != todoItem.Completed {
+		todoItem.Completed = updatedTodo.Completed
+	}
+	h.store.m[todoID] = todoItem
 
-	jsonBytes, err := json.Marshal(u)
+	jsonBytes, err := json.Marshal(todoItem)
 	if err != nil {
 		utils.InternalServerError(res, req)
 		return
@@ -172,21 +180,21 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *TodoHandler) Delete(res http.ResponseWriter, req *http.Request) {
-	matches := getUser_RegularExpression.FindStringSubmatch(req.URL.Path)
+	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 {
 		utils.NotFound(res, req)
 		return
 	}
 
-	userID := matches[1]
+	todoID := matches[1]
 	h.store.Lock()
-	_, ok := h.store.m[userID]
+	_, ok := h.store.m[todoID]
 	h.store.Unlock()
 	if !ok {
 		utils.NotFound(res, req)
 		return
 	}
 
-	delete(h.store.m, userID)
+	delete(h.store.m, todoID)
 	res.WriteHeader(http.StatusOK)
 }
