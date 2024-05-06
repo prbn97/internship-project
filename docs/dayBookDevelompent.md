@@ -36,18 +36,21 @@ Comecando a executar os primeiros itens do primeiro milestone definido. Criando 
 - - -
 The structure that i will follow.
 
-    todo-api/
+    /todo-api/
             + /api/
-                + /handlers/
-                    - /todo_handler.go
                 - /main.go
             + /docs/
                 - /dayBookDevelopment.md
                 - /documentation.md
+            + /handlers/
+                - /user_handler.go
+                - /todo_handler.go
             + /models/                        
+                - /user.go
                 - /todo.go
             + /tests/
-                - /todo_handler_test.go
+            + /utils/                        
+                - /http_errors.go
             - README.md
             - go.mod
             - Makefile
@@ -56,9 +59,9 @@ The structure that i will follow.
 Helps me alot.
 
 - - -
-### April day 2 - Focus on development 
+### May day 2 - Focus on development 
 - - -
-### April day 3 - Focus on *Milestone 1* and *Milestone 2* 
+### May day 3 - Focus on *Milestone 1* and *Milestone 2* 
 - - -
 + #### **(future) fetaure - Task list**
     - todo that is a list of todo itens, have all proprieties.
@@ -109,3 +112,12 @@ ServeMux is an HTTP request multiplexer. It matches the URL of each incoming req
 ### *Handler* are our requests methods, that will be our Fucntions to deal with requests. When certan requests are passes in our server lets use this way to deal with it.
 - - -
 ### Start a http.ServMux() 
+
+
+# May day 5 - Focus on development 
+
+the videdo make me do a user_handler that can be use for and user of the ToDO items JSON [Web Tokens](https://www.alura.com.br/artigos/o-que-e-json-web-tokensg)
+
+
+# May day 6 - Focus on development 
+need create the todo_handler now and focus on tests
