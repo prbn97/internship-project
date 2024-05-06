@@ -6,17 +6,28 @@ import (
 	"net/http"
 )
 
-// create todo_handler
-
 func main() {
 	mux := http.NewServeMux()
+
+	// Configure os handlers
+	setupHandlers(mux)
+
+	fmt.Println("API running at http://localhost:8080")
+	fmt.Println("Listening...")
+
+	// Inicie o servidor HTTP
+	http.ListenAndServe("localhost:8080", mux)
+}
+
+func setupHandlers(mux *http.ServeMux) {
+	// Inicialize os handlers de usuário e de ToDo
 	userH := handlers.NewUserHandler()
+	todoH := handlers.NewTodoHandler()
 
-	fmt.Println("API running at http://localhost:8080/users")
-	fmt.Println("listening...")
-
+	// Registre os handlers para seus respectivos endpoints
 	mux.Handle("/users/", userH) // /users/{id}
 	mux.Handle("/users", userH)  // /users
-	http.ListenAndServe("localhost:8080", mux)
 
+	mux.Handle("/todos/", todoH) // /todos/{id}
+	mux.Handle("/todos", todoH)  // /todos
 }

@@ -3,12 +3,9 @@ package handlers
 import (
 	"api/main.go/models"
 	"api/main.go/utils"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"regexp"
-	"strings"
 	"sync"
 )
 
@@ -113,7 +110,7 @@ func (h *UserHandler) Create(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	newID, err := generateID(20) // Generate a new ID as an integer
+	newID, err := GenerateID(20) // Generate a new ID as an integer
 	if err != nil {
 		utils.InternalServerError(res, req)
 		return
@@ -133,34 +130,6 @@ func (h *UserHandler) Create(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusOK)
 	res.Write(jsonBytes)
 
-}
-func generateID(length int) (string, error) {
-	// Calcula o número de bytes necessário para gerar o ID
-	numBytes := length / 2
-	if length%2 != 0 {
-		numBytes++
-	}
-
-	// Gera bytes aleatórios usando crypto/rand
-	randomBytes := make([]byte, numBytes)
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		return "", err
-	}
-
-	// Codifica os bytes aleatórios em uma string hexadecimal
-	id := hex.EncodeToString(randomBytes)
-
-	// Ajusta o tamanho do ID se necessário
-	if len(id) > length {
-		id = id[:length]
-	} else if len(id) < length {
-		// Se o ID gerado for menor que o tamanho especificado,
-		// preenche o restante com caracteres '0'
-		id += strings.Repeat("0", length-len(id))
-	}
-
-	return id, nil
 }
 
 func (h *UserHandler) Update(res http.ResponseWriter, req *http.Request) {
