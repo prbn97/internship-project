@@ -3,11 +3,15 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"strings"
 )
 
 func GenerateID(length int) (string, error) {
 	// Calcula o número de bytes necessário para gerar o ID
+	if length <= 0 {
+		return "", errors.New("invalid length")
+	}
 	numBytes := length / 2
 	if length%2 != 0 {
 		numBytes++
