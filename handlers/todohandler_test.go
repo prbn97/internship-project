@@ -67,26 +67,24 @@ func TestTodoHandler_Get(t *testing.T) {
 
 	wPost := httptest.NewRecorder()
 	todoHandler.ServeHTTP(wPost, reqPost)
-	resCreate := wPost.Result()
-	defer resCreate.Body.Close()
-	if resCreate.StatusCode != http.StatusOK {
-		t.Fatalf("failed to create todo, status code: %d", resCreate.StatusCode)
+	resPost := wPost.Result()
+	defer resPost.Body.Close()
+	if resPost.StatusCode != http.StatusOK {
+		t.Fatalf("failed to create todo, status code: %d", resPost.StatusCode)
 	}
 
-	// Extrair o ID do novo Todo criado
 	var createdTodo models.Todo
-	if err := json.NewDecoder(resCreate.Body).Decode(&createdTodo); err != nil {
+	if err := json.NewDecoder(resPost.Body).Decode(&createdTodo); err != nil {
 		t.Fatalf("error decoding response body: %v", err)
 	}
 
-	// Criar uma solicitação GET para obter o item pelo ID
+	// Get request by id
 	reqGet := httptest.NewRequest(http.MethodGet, "/todos/"+createdTodo.ID, nil)
 	wGet := httptest.NewRecorder()
 	todoHandler.ServeHTTP(wGet, reqGet)
 	resGet := wGet.Result()
 	defer resGet.Body.Close()
 
-	// Verificar se o código de status é 200 OK
 	if resGet.StatusCode != http.StatusOK {
 		t.Fatalf("expected status code %d, got %d", http.StatusOK, resGet.StatusCode)
 	}
@@ -98,5 +96,50 @@ func TestTodoHandler_Get(t *testing.T) {
 	}
 	if !reflect.DeepEqual(createdTodo, retrievedTodo) {
 		t.Fatalf("expected todo %+v, got %+v", createdTodo, retrievedTodo)
+	}
+}
+
+func TestTodoHandler_Delete(t *testing.T) {
+
+	todoHandler := NewTodoHandler()
+
+	newTodo := models.Todo{
+		Title:       "Test Todo",
+		Description: "Test Description",
+		Completed:   false,
+	}
+	todoJSON, err := json.Marshal(newTodo)
+	if err != nil {
+		t.Fatalf("error marshalling todo: %v", err)
+	}
+
+	reqPost := httptest.NewRequest(http.MethodPost, "/todos", bytes.NewReader(todoJSON))
+	wPost := httptest.NewRecorder()
+	todoHandler.ServeHTTP(wPost, reqPost)
+	resPost := wPost.Result()
+	defer resPost.Body.Close()
+	if resPost.StatusCode != http.StatusOK {
+		t.Fatalf("failed to create todo, status code: %d", resPost.StatusCode)
+	}
+
+	var createdTodo models.Todo
+	if err := json.NewDecoder(resPost.Body).Decode(&createdTodo); err != nil {
+		t.Fatalf("error decoding response body: %v", err)
+	}
+
+	// Delete request by id
+	reqDelete := httptest.NewRequest(http.MethodDelete, "/todos/"+createdTodo.ID, nil)
+	wDelete := httptest.NewRecorder()
+	todoHandler.ServeHTTP(wDelete, reqDelete)
+	resDelete := wDelete.Result()
+	defer resDelete.Body.Close()
+
+	if resDelete.StatusCode != http.StatusOK {
+		t.Fatalf("expected status code %d, got %d", http.StatusOK, resDelete.StatusCode)
+	}
+
+	_, exists := todoHandler.store.m[createdTodo.ID]
+	if exists {
+		t.Fatalf("todo was not deleted successfully")
 	}
 }
