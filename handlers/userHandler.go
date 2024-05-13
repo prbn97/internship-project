@@ -101,8 +101,6 @@ func (h *UserHandler) Get(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *UserHandler) Create(res http.ResponseWriter, req *http.Request) {
-	// decodes the JSON data from the request body into a user struct.
-	// This POST assumes that the request contains JSON data representing a user.
 
 	u := models.User{}
 	if err := json.NewDecoder(req.Body).Decode(&u); err != nil {
@@ -178,7 +176,7 @@ func (h *UserHandler) Delete(res http.ResponseWriter, req *http.Request) {
 	userID := matches[1]
 	h.store.Lock()
 	_, ok := h.store.m[userID]
-	h.store.Unlock()
+	defer h.store.Unlock()
 	if !ok {
 		utils.NotFound(res, req)
 		return

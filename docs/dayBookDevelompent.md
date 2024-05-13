@@ -143,21 +143,20 @@ The new structure that i will follow.
         + /handlers/
                 - /generateID.go
                 - /generateID_test.go
-                - /todohandler.go
-                - /todohandler_test.go
-                - /userhandler.go
-                - /userhandler_test.go
+                - /todoHandler.go
+                - /todoHandler_test.go
+                - /userHandler.go
+                - /userHandler_test.go
         + /models/                        
                 - /user.go
                 - /todo.go
         + /tests/
-
         + /utils/                        
                 - /http_errors.go
-
-        - README.md
         - go.mod
+        -god.sum
         - Makefile
+        -README.md
 
 # May day 7 - Focus on test development 
 
@@ -179,3 +178,9 @@ ___
 > Fetaure - User can be created and can created tasks
 
 [Go JWT Authentication Tutorial](https://www.youtube.com/watch?v=Qk6UgCps5Dc&t)
+
+# May day 13
+
+Problem with mi tests
+
+this article can help me [link](https://golang.cafe/blog/golang-httptest-example.html)
