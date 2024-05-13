@@ -19,11 +19,7 @@ func main() {
 
 func setupHandlers(mux *http.ServeMux) {
 
-	userH := handlers.NewUserHandler()
 	todoH := handlers.NewTodoHandler()
-
-	mux.Handle("/users/", userH) // /users/{id}
-	mux.Handle("/users", userH)  // /users
 
 	mux.Handle("/todos/", todoH) // /todos/{id}
 	mux.Handle("/todos", todoH)  // /todos
