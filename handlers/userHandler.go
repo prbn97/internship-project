@@ -108,7 +108,7 @@ func (h *UserHandler) Create(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	newID, err := GenerateID(20) // Generate a new ID as an integer
+	newID, err := GenerateID(20)
 	if err != nil {
 		utils.InternalServerError(res, req)
 		return
@@ -117,7 +117,7 @@ func (h *UserHandler) Create(res http.ResponseWriter, req *http.Request) {
 	u.ID = newID
 
 	h.store.Lock()
-	h.store.m[u.ID] = u // adds the new user to the datastore
+	h.store.m[u.ID] = u
 	h.store.Unlock()
 
 	jsonBytes, err := json.Marshal(u)
@@ -147,7 +147,6 @@ func (h *UserHandler) Update(res http.ResponseWriter, req *http.Request) {
 	}
 
 	var updatedUser models.User
-	// Decodificar o corpo da solicitação para obter os novos dados do usuário
 	if err := json.NewDecoder(req.Body).Decode(&updatedUser); err != nil {
 		utils.BadRequest(res, req)
 		return

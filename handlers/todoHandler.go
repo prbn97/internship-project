@@ -9,25 +9,21 @@ import (
 	"sync"
 )
 
-// expressões para manipular os endpoints de ToDo
 var (
 	listTodoRegularExpression   = regexp.MustCompile(`^/todos[\/]*$`)
 	getTodoRegularExpression    = regexp.MustCompile(`^/todos/([a-zA-Z0-9]+)$`)
 	createTodoRegularExpression = regexp.MustCompile(`^/todos[\/]*$`)
 )
 
-// TodoDatastore é uma estrutura para armazenar os itens de ToDo
 type TodoDatastore struct {
 	m map[string]models.Todo
 	*sync.RWMutex
 }
 
-// TodoHandler é o manipulador para os endpoints relacionados a ToDo
 type TodoHandler struct {
 	store *TodoDatastore
 }
 
-// NewTodoHandler cria um novo manipulador para itens de ToDo
 func NewTodoHandler() *TodoHandler {
 	return &TodoHandler{
 		store: &TodoDatastore{
@@ -37,7 +33,6 @@ func NewTodoHandler() *TodoHandler {
 	}
 }
 
-// implementa o método ServeHTTP da interface http.Handler
 func (h *TodoHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("content-type", "application/json")
 	switch {
@@ -66,7 +61,7 @@ func (h *TodoHandler) List(res http.ResponseWriter, req *http.Request) {
 
 	todos := make([]models.Todo, 0, len(h.store.m))
 	for _, todoItem := range h.store.m {
-		todos = append(todos, todoItem) // ponteiro no todoItem
+		todos = append(todos, todoItem)
 	}
 
 	jsonBytes, err := json.Marshal(todos)
@@ -103,8 +98,7 @@ func (h *TodoHandler) Get(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
-	// decodes the JSON data from the request body into a user struct.
-	// This POST assumes that the request contains JSON data representing a user.
+
 	h.store.Lock()
 	defer h.store.Unlock()
 
@@ -151,13 +145,11 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Decodificar o corpo da solicitação para obter os novos dados do todo item
 	var updatedTodo models.Todo
 	if err := json.NewDecoder(req.Body).Decode(&updatedTodo); err != nil {
 		utils.BadRequest(res, req)
 		return
 	}
-	// Atualizar os campos do todo item, se fornecidos
 	if updatedTodo.Title != "" {
 		todoItem.Title = updatedTodo.Title
 	}
