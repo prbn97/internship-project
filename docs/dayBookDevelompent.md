@@ -151,6 +151,7 @@ The new structure that i will follow.
                 - /user.go
                 - /todo.go
         + /tests/
+
         + /utils/                        
                 - /http_errors.go
         - go.mod
@@ -179,7 +180,7 @@ ___
 
 [Go JWT Authentication Tutorial](https://www.youtube.com/watch?v=Qk6UgCps5Dc&t)
 
-# May day 13
+# May day 13 - Focus on test development
 
 Problem with mi tests
 
