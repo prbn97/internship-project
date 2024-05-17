@@ -223,3 +223,32 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 
 }
 ```
+
+# May day 15 - Focus on test development
+
+Conversando com o Gui sobre minha api, vimos que posso deixar meu teste menores e mais claro, conversamos sobre set up enviroment.
+
+Com isso relendo esse codigo vejo que "crio um manipulador" nos testes TestTodoHandler_Get e TestTodoHandler_Delete. Busquei mais informações com o que conversamos e entendi melhor, criar o ambiente pra teste e depois limpar os recursos, comumente chamado de "teardown"
+
+## Setup Environment: 
+A função setupEnv inicializa o TodoHandler e retorna uma função de teardown, mesmo que atualmente não haja necessidade de teardown. Isso prepara o ambiente de teste consistentemente para cada teste.
+
+Vou ja criar um manipulador e adicionar itens nele melhorando os testes.
+
+```go
+
+// setupEnv initializes the environment for each test
+func setupEnv(t *testing.T) (*TodoHandler, func()) {
+	todoHandler := NewTodoHandler()
+
+    //create todos
+    //add todos in the handler
+
+	// Return the handler and a teardown function to be called after the test
+	return todoHandler, func() {
+		// Perform any necessary teardown here
+        // like delete the handler
+	}
+}
+
+```
