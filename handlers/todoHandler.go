@@ -4,6 +4,7 @@ import (
 	"api/main.go/models"
 	"api/main.go/utils"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"regexp"
 	"sync"
@@ -76,7 +77,7 @@ func (h *TodoHandler) List(res http.ResponseWriter, req *http.Request) {
 func (h *TodoHandler) Get(res http.ResponseWriter, req *http.Request) {
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 {
-		utils.NotFound(res, req)
+		utils.NotFound(res, req) // error id not valid?
 		return
 	}
 	h.store.RLock()
@@ -104,7 +105,8 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 
 	u := models.Todo{}
 	if err := json.NewDecoder(req.Body).Decode(&u); err != nil {
-		utils.BadRequest(res, req)
+		fmt.Println(err)
+		utils.BadRequest(res, req, "invalid json")
 		return
 	}
 
@@ -131,7 +133,7 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 {
-		utils.NotFound(res, req)
+		utils.NotFound(res, req) // error id not valid?
 		return
 	}
 
@@ -141,13 +143,13 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 	defer h.store.Unlock()
 
 	if !ok {
-		utils.NotFound(res, req)
+		utils.NotFound(res, req) // error id not found
 		return
 	}
 
 	var updatedTodo models.Todo
 	if err := json.NewDecoder(req.Body).Decode(&updatedTodo); err != nil {
-		utils.BadRequest(res, req)
+		utils.BadRequest(res, req, err.Error()) // what say?
 		return
 	}
 	if updatedTodo.Title != "" {
@@ -173,7 +175,7 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 func (h *TodoHandler) Delete(res http.ResponseWriter, req *http.Request) {
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 {
-		utils.NotFound(res, req)
+		utils.NotFound(res, req) // error id not valid?
 		return
 	}
 
@@ -182,7 +184,7 @@ func (h *TodoHandler) Delete(res http.ResponseWriter, req *http.Request) {
 	_, ok := h.store.m[todoID]
 	defer h.store.Unlock()
 	if !ok {
-		utils.NotFound(res, req)
+		utils.NotFound(res, req) // error id not found
 		return
 	}
 

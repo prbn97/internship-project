@@ -188,4 +188,38 @@ this article can help me [link](https://golang.cafe/blog/golang-httptest-example
 
 # May day 14 - Focus on test development
 
-TodoErro is handling erro in the requets, the goal is to get error with customize messages
+TodoErro is handling errors in the requets, the goal is to get error with customize messages
+
+i will start with the httpErrors.go, now the function recive a string, that will be for custom erros messages... like "id is not valid" or "id not found" for the api client.
+
+```go
+
+// function to handling errors with TodoError ***
+func BadRequest(res http.ResponseWriter, req *http.Request, msg string) {
+	res.WriteHeader(http.StatusBadRequest)
+	errorJson := models.TodoError{ 
+		Error:   "bad request",
+		Message: msg,
+	}
+	jsonBytes, err := json.Marshal(errorJson)
+	if err != nil {
+		return
+	}
+	res.Write(jsonBytes)
+}
+
+func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
+
+	u := models.Todo{}
+	if err := json.NewDecoder(req.Body).Decode(&u); err != nil {
+		fmt.Println(err)
+		utils.BadRequest(res, req, "invalid json") // customize the message ***
+		return
+	}
+    
+    .
+    .
+    .
+
+}
+```
