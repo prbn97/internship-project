@@ -6,3 +6,8 @@ type Todo struct {
 	Description string `json:"description"`
 	Completed   bool   `json:"completed"`
 }
+
+type TodoError struct {
+	Error   string `json:"error"`
+	Message string `json:"message"`
+}

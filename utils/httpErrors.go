@@ -1,11 +1,23 @@
 package utils
 
-import "net/http"
+import (
+	"api/main.go/models"
+	"encoding/json"
+	"net/http"
+)
 
 // 400
-func BadRequest(res http.ResponseWriter, req *http.Request) {
+func BadRequest(res http.ResponseWriter, req *http.Request, msg string) {
 	res.WriteHeader(http.StatusBadRequest)
-	res.Write([]byte(`{"error": "bad request"}`))
+	errorJson := models.TodoError{
+		Error:   "bad request",
+		Message: msg,
+	}
+	jsonBytes, err := json.Marshal(errorJson)
+	if err != nil {
+		return
+	}
+	res.Write(jsonBytes)
 }
 
 // 401

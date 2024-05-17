@@ -185,3 +185,7 @@ ___
 Problem with mi tests
 
 this article can help me [link](https://golang.cafe/blog/golang-httptest-example.html)
+
+# May day 14 - Focus on test development
+
+TodoErro is handling erro in the requets, the goal is to get error with customize messages
