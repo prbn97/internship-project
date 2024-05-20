@@ -33,9 +33,17 @@ func Forbidden(res http.ResponseWriter, req *http.Request) {
 }
 
 // 404
-func NotFound(res http.ResponseWriter, req *http.Request) {
+func NotFound(res http.ResponseWriter, req *http.Request, msg string) {
 	res.WriteHeader(http.StatusNotFound)
-	res.Write([]byte(`{"error": "not found"}`))
+	errorJson := models.TodoError{
+		Error:   "bad request",
+		Message: msg,
+	}
+	jsonBytes, err := json.Marshal(errorJson)
+	if err != nil {
+		return
+	}
+	res.Write(jsonBytes)
 }
 
 // 405

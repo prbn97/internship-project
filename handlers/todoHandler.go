@@ -12,7 +12,7 @@ import (
 
 var (
 	listTodoRegularExpression   = regexp.MustCompile(`^/todos[\/]*$`)
-	getTodoRegularExpression    = regexp.MustCompile(`^/todos/([a-zA-Z0-9]+)$`)
+	getTodoRegularExpression    = regexp.MustCompile(`^/todos/([a-zA-Z0-9]{20})$`)
 	createTodoRegularExpression = regexp.MustCompile(`^/todos[\/]*$`)
 )
 
@@ -36,6 +36,7 @@ func NewTodoHandler() *TodoHandler {
 
 func (h *TodoHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("content-type", "application/json")
+
 	switch {
 	case req.Method == http.MethodGet && listTodoRegularExpression.MatchString(req.URL.Path):
 		h.List(res, req)
@@ -52,7 +53,7 @@ func (h *TodoHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	case req.Method == http.MethodDelete && getTodoRegularExpression.MatchString(req.URL.Path):
 		h.Delete(res, req)
 	default:
-		utils.NotFound(res, req)
+		utils.MethodNotAllowed(res, req)
 	}
 }
 
@@ -77,14 +78,16 @@ func (h *TodoHandler) List(res http.ResponseWriter, req *http.Request) {
 func (h *TodoHandler) Get(res http.ResponseWriter, req *http.Request) {
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 {
-		utils.NotFound(res, req) // error id not valid?
+		utils.NotFound(res, req, "invalid ID")
 		return
 	}
+
 	h.store.RLock()
+	defer h.store.RUnlock()
+
 	todo, ok := h.store.m[matches[1]]
-	h.store.RUnlock()
 	if !ok {
-		utils.NotFound(res, req)
+		utils.NotFound(res, req, "ID not found")
 		return
 	}
 
@@ -99,12 +102,11 @@ func (h *TodoHandler) Get(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
-
 	h.store.Lock()
 	defer h.store.Unlock()
 
-	u := models.Todo{}
-	if err := json.NewDecoder(req.Body).Decode(&u); err != nil {
+	todo := models.Todo{}
+	if err := json.NewDecoder(req.Body).Decode(&todo); err != nil {
 		fmt.Println(err)
 		utils.BadRequest(res, req, "invalid json")
 		return
@@ -116,40 +118,40 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	u.ID = newID
+	todo.ID = newID
 
-	h.store.m[u.ID] = u
+	h.store.m[todo.ID] = todo
 
-	jsonBytes, err := json.Marshal(u)
+	jsonBytes, err := json.Marshal(todo)
 	if err != nil {
 		utils.InternalServerError(res, req)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
 	res.Write(jsonBytes)
-
 }
 
 func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 {
-		utils.NotFound(res, req) // error id not valid?
+		utils.NotFound(res, req, "invalid ID")
 		return
 	}
 
 	todoID := matches[1]
+
 	h.store.Lock()
-	todoItem, ok := h.store.m[todoID]
 	defer h.store.Unlock()
 
+	todoItem, ok := h.store.m[todoID]
 	if !ok {
-		utils.NotFound(res, req) // error id not found
+		utils.NotFound(res, req, "ID not found")
 		return
 	}
 
 	var updatedTodo models.Todo
 	if err := json.NewDecoder(req.Body).Decode(&updatedTodo); err != nil {
-		utils.BadRequest(res, req, err.Error()) // what say?
+		utils.BadRequest(res, req, "invalid json")
 		return
 	}
 	if updatedTodo.Title != "" {
@@ -175,19 +177,27 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 func (h *TodoHandler) Delete(res http.ResponseWriter, req *http.Request) {
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 {
-		utils.NotFound(res, req) // error id not valid?
+		utils.NotFound(res, req, "invalid ID")
 		return
 	}
 
 	todoID := matches[1]
+
 	h.store.Lock()
-	_, ok := h.store.m[todoID]
 	defer h.store.Unlock()
+
+	todoItem, ok := h.store.m[todoID]
 	if !ok {
-		utils.NotFound(res, req) // error id not found
+		utils.NotFound(res, req, "ID not found")
+		return
+	}
+	jsonBytes, err := json.Marshal(todoItem)
+	if err != nil {
+		utils.InternalServerError(res, req)
 		return
 	}
 
 	delete(h.store.m, todoID)
 	res.WriteHeader(http.StatusOK)
+	res.Write(jsonBytes)
 }

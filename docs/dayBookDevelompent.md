@@ -11,21 +11,21 @@ Sumary
 
 
 ## April day 22 - What is a API?
-Na última sexta recebi a tarefa de desenvolver uma API Rest. 
+Last Friday I received the task of developing a Rest API.
 
-Recebi a recomendação de um amigo de usar OpenAPI pra planejar toda a API, 
-com isso meu foco foi entender melhor o conceito e a história das API, API RestFul.
+We received a recommendation from a friend to use OpenAPI to plan the entire API,
+Therefore, my focus was to better understand the concept and history of the API, RestFul API.
 
-OpenAPI, resumidamente planeja toda uma api, alem de documenta-la. Isso produz uma aplicacao profissional. Entretanto o foco esta no principio de uma API.
+OpenAPI, in short, plans an entire API, in addition to the documentation. This produces a professional application. However, the focus is not on the principle of an API.
 
 
 ## April day 24 - Getting API's examples
-Busquei por *exemplos de api rest em Go*, na internet para criar a minha. Nao achei tanta coisa util devido ao uso de frameworks. Queria entender de forma mais conceitual
-> devia ter buscando melhor, no decorrer dos dias, consegui.
+I searched for *examples of api rest in Go* on the internet to create my own. I didn't find much useful due to the use of frameworks. I would like to understand in a more conceptual way
+> I should have tried better, as the days went by, I did it.
 
 
 ## April day 27 of aprill - Get some milestones
-Comecando a executar os primeiros itens do primeiro milestone definido. Criando a estrutura do todo item e buscando entrender melhor atraves de exemplos praticos como uma api funciona, como sua estrutura é organizada.
+Starting to execute the first items of the first defined milestone. Creating the structure of the entire item and seeking to better understand through practical examples how an API works, how its structure is organized.
 
 ## April day 29  - Focus on develompment
 
@@ -226,14 +226,14 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 
 # May day 15 - Focus on test development
 
-Conversando com o Gui sobre minha api, vimos que posso deixar meu teste menores e mais claro, conversamos sobre set up enviroment.
+Talking to Gui about my API, we saw that I can make my test smaller and clearer, we talked about setting up environment.
 
-Com isso relendo esse codigo vejo que "crio um manipulador" nos testes TestTodoHandler_Get e TestTodoHandler_Delete. Busquei mais informações com o que conversamos e entendi melhor, criar o ambiente pra teste e depois limpar os recursos, comumente chamado de "teardown"
+So, re-reading this code I see that I "create a handler" in the TestTodoHandler_Get and TestTodoHandler_Delete tests. I sought more information from what we talked about and understood better, creating the environment for testing and then cleaning up the resources, commonly called "teardown"
 
 ## Setup Environment: 
-A função setupEnv inicializa o TodoHandler e retorna uma função de teardown, mesmo que atualmente não haja necessidade de teardown. Isso prepara o ambiente de teste consistentemente para cada teste.
+The setupEnv function initializes the TodoHandler and returns a teardown function, even if there is currently no need for a teardown. This prepares the test environment consistently for each test.
 
-Vou ja criar um manipulador e adicionar itens nele melhorando os testes.
+I'm going to create a handler and add items to it, improving the tests.
 
 ```go
 
@@ -252,3 +252,10 @@ func setupEnv(t *testing.T) (*TodoHandler, func()) {
 }
 
 ```
+
+
+# May day 20 - **Focus Milestone 4: Error Handling**
+
+Today my focus in Error Handling reval that i have a problem with my PUT method, need fix that.
+
+Just then im getting back to handling bad request like using invalid ids when doing get by id.
