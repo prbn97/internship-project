@@ -11,7 +11,7 @@ import (
 
 var (
 	listTodoRegularExpression   = regexp.MustCompile(`^/todos[\/]*$`)
-	getTodoRegularExpression    = regexp.MustCompile(`^/todos/([a-zA-Z0-9]{20})$`)
+	getTodoRegularExpression    = regexp.MustCompile(`^/todos/([a-zA-Z0-9]+)$`)
 	createTodoRegularExpression = regexp.MustCompile(`^/todos[\/]*$`)
 )
 
@@ -45,15 +45,15 @@ func (h *TodoHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		h.List(res, req)
 		return
 
-	case req.Method == http.MethodGet && getTodoRegularExpression.MatchString(req.URL.Path):
+	case req.Method == http.MethodGet: // && getTodoRegularExpression.MatchString(req.URL.Path):
 		h.Get(res, req)
 		return
 
-	case req.Method == http.MethodPut && getTodoRegularExpression.MatchString(req.URL.Path):
+	case req.Method == http.MethodPut: // && getTodoRegularExpression.MatchString(req.URL.Path)
 		h.Update(res, req)
 		return
 
-	case req.Method == http.MethodDelete && getTodoRegularExpression.MatchString(req.URL.Path):
+	case req.Method == http.MethodDelete: // && getTodoRegularExpression.MatchString(req.URL.Path):
 		h.Delete(res, req)
 		return
 
@@ -113,7 +113,7 @@ func (h *TodoHandler) List(res http.ResponseWriter, req *http.Request) {
 
 func (h *TodoHandler) Get(res http.ResponseWriter, req *http.Request) {
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
-	if len(matches) < 2 {
+	if len(matches) < 2 || len(matches[1]) != 20 {
 		utils.NotFound(res, req, "invalid ID")
 		return
 	}
@@ -139,7 +139,7 @@ func (h *TodoHandler) Get(res http.ResponseWriter, req *http.Request) {
 
 func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
-	if len(matches) < 2 {
+	if len(matches) < 2 || len(matches[1]) != 20 {
 		utils.NotFound(res, req, "invalid ID")
 		return
 	}
@@ -184,7 +184,7 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 
 func (h *TodoHandler) Delete(res http.ResponseWriter, req *http.Request) {
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
-	if len(matches) < 2 {
+	if len(matches) < 2 || len(matches[1]) != 20 {
 		utils.NotFound(res, req, "invalid ID")
 		return
 	}

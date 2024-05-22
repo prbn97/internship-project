@@ -289,3 +289,13 @@ when in fact it was supposed to report an error due to an invalid ID
 
 the problem is in ServeHTTP()
 
+the swith case always do the default case, my
+
+```go
+case req.Method == http.MethodGet: // && getTodoRegularExpression.MatchString(req.URL.Path):
+		h.Get(res, req)
+		return
+```
+> i comment the second condition and let the function validate if the id called is valid or not
+
+
