@@ -89,7 +89,7 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 		utils.InternalServerError(res, req)
 		return
 	}
-	res.WriteHeader(http.StatusOK)
+	res.WriteHeader(http.StatusCreated)
 	res.Write(jsonBytes)
 }
 

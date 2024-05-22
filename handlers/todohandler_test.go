@@ -35,7 +35,7 @@ func setupEnv(t *testing.T) (*TodoHandler, func(), []byte, models.Todo, []byte) 
 
 		response := postResponse.Result()
 		defer response.Body.Close()
-		if response.StatusCode != http.StatusOK {
+		if response.StatusCode != http.StatusCreated {
 			t.Fatalf("failed to create initial todo, status code: %d", response.StatusCode)
 		}
 
@@ -74,6 +74,25 @@ func setupEnv(t *testing.T) (*TodoHandler, func(), []byte, models.Todo, []byte) 
 	return todoHandler, teardown, NewTodoJSON, todoItem, UpTodoJSON
 }
 
+func TestTodoHandler_Create(t *testing.T) {
+	todoHandler, teardown, todoJSON, _, _ := setupEnv(t)
+	defer teardown()
+
+	// POST request (toDo #3)
+	postRequest := httptest.NewRequest(http.MethodPost, "/todos", bytes.NewBuffer(todoJSON))
+	postResponse := httptest.NewRecorder()
+	handler := http.HandlerFunc(todoHandler.ServeHTTP)
+
+	handler.ServeHTTP(postResponse, postRequest)
+
+	response := postResponse.Result()
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusCreated {
+		t.Errorf("expected status code %d, got %d", http.StatusCreated, response.StatusCode)
+	}
+}
+
 func TestTodoHandler_List(t *testing.T) {
 	todoHandler, teardown, _, _, _ := setupEnv(t)
 	defer teardown()
@@ -104,25 +123,6 @@ func TestTodoHandler_List(t *testing.T) {
 
 	if len(todos) != 2 {
 		t.Errorf("expected 2 todos items, got %d", len(todos))
-	}
-}
-
-func TestTodoHandler_Create(t *testing.T) {
-	todoHandler, teardown, todoJSON, _, _ := setupEnv(t)
-	defer teardown()
-
-	// POST request (toDo #3)
-	postRequest := httptest.NewRequest(http.MethodPost, "/todos", bytes.NewBuffer(todoJSON))
-	postResponse := httptest.NewRecorder()
-	handler := http.HandlerFunc(todoHandler.ServeHTTP)
-
-	handler.ServeHTTP(postResponse, postRequest)
-
-	response := postResponse.Result()
-	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		t.Errorf("expected status code %d, got %d", http.StatusOK, response.StatusCode)
 	}
 }
 
