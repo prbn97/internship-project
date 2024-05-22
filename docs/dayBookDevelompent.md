@@ -262,6 +262,7 @@ Just then im getting back to handling bad request like using invalid ids when do
 
 # May day 21 - **Focus Milestone 4: Error Handling**
 
+## bug fixing - DisallowUnknownFields()
 I found a problem in my PUT and POST methods. When I make a request and put one of the fields wrong, it doesn't show any error, it just ignores that wrong field...
 
 > example to make it clearer.
@@ -278,3 +279,13 @@ The solution to this was to create a decoder and use the DisallowUnknownFields()
 decoder := json.NewDecoder(req.Body)
 	decoder.DisallowUnknownFields()
 ```
+
+## Bad requests - "The ID is not valid"
+
+I noticed that when doing a **GET by ID** where I enter an ID that deviates from the ID pattern I created (of 20 characters) the api incorrectly reports the error:
+> {"error": "method not allowed"}
+
+when in fact it was supposed to report an error due to an invalid ID
+
+the problem is in ServeHTTP()
+

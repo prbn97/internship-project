@@ -37,23 +37,60 @@ func (h *TodoHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("content-type", "application/json")
 
 	switch {
-	case req.Method == http.MethodGet && listTodoRegularExpression.MatchString(req.URL.Path):
-		h.List(res, req)
-		return
-	case req.Method == http.MethodGet && getTodoRegularExpression.MatchString(req.URL.Path):
-		h.Get(res, req)
-		return
 	case req.Method == http.MethodPost && createTodoRegularExpression.MatchString(req.URL.Path):
 		h.Create(res, req)
 		return
+
+	case req.Method == http.MethodGet && listTodoRegularExpression.MatchString(req.URL.Path):
+		h.List(res, req)
+		return
+
+	case req.Method == http.MethodGet && getTodoRegularExpression.MatchString(req.URL.Path):
+		h.Get(res, req)
+		return
+
 	case req.Method == http.MethodPut && getTodoRegularExpression.MatchString(req.URL.Path):
 		h.Update(res, req)
 		return
+
 	case req.Method == http.MethodDelete && getTodoRegularExpression.MatchString(req.URL.Path):
 		h.Delete(res, req)
+		return
+
 	default:
 		utils.MethodNotAllowed(res, req)
 	}
+}
+
+func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
+	h.store.Lock()
+	defer h.store.Unlock()
+
+	var todo models.Todo
+	decoder := json.NewDecoder(req.Body)
+	decoder.DisallowUnknownFields() // this will cause decoder to return an error if any unknown field is encountered
+	if err := decoder.Decode(&todo); err != nil {
+		utils.BadRequest(res, req, "invalid json")
+		return
+	}
+
+	newID, err := GenerateID(20)
+	if err != nil {
+		utils.InternalServerError(res, req)
+		return
+	}
+
+	todo.ID = newID
+
+	h.store.m[todo.ID] = todo
+
+	jsonBytes, err := json.Marshal(todo)
+	if err != nil {
+		utils.InternalServerError(res, req)
+		return
+	}
+	res.WriteHeader(http.StatusOK)
+	res.Write(jsonBytes)
 }
 
 func (h *TodoHandler) List(res http.ResponseWriter, req *http.Request) {
@@ -96,37 +133,6 @@ func (h *TodoHandler) Get(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	res.WriteHeader(http.StatusOK)
-	res.Write(jsonBytes)
-}
-
-func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
-	h.store.Lock()
-	defer h.store.Unlock()
-
-	var todo models.Todo
-	decoder := json.NewDecoder(req.Body)
-	decoder.DisallowUnknownFields() // this will cause decoder to return an error if any unknown field is encountered
-	if err := decoder.Decode(&todo); err != nil {
-		utils.BadRequest(res, req, "invalid json")
-		return
-	}
-
-	newID, err := GenerateID(20)
-	if err != nil {
-		utils.InternalServerError(res, req)
-		return
-	}
-
-	todo.ID = newID
-
-	h.store.m[todo.ID] = todo
-
-	jsonBytes, err := json.Marshal(todo)
-	if err != nil {
-		utils.InternalServerError(res, req)
-		return
-	}
 	res.WriteHeader(http.StatusOK)
 	res.Write(jsonBytes)
 }
