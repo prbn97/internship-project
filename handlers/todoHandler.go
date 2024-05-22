@@ -4,7 +4,6 @@ import (
 	"api/main.go/models"
 	"api/main.go/utils"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"regexp"
 	"sync"
@@ -105,9 +104,10 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 	h.store.Lock()
 	defer h.store.Unlock()
 
-	todo := models.Todo{}
-	if err := json.NewDecoder(req.Body).Decode(&todo); err != nil {
-		fmt.Println(err)
+	var todo models.Todo
+	decoder := json.NewDecoder(req.Body)
+	decoder.DisallowUnknownFields() // this will cause decoder to return an error if any unknown field is encountered
+	if err := decoder.Decode(&todo); err != nil {
 		utils.BadRequest(res, req, "invalid json")
 		return
 	}
@@ -150,7 +150,9 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 	}
 
 	var updatedTodo models.Todo
-	if err := json.NewDecoder(req.Body).Decode(&updatedTodo); err != nil {
+	decoder := json.NewDecoder(req.Body)
+	decoder.DisallowUnknownFields() // this will cause decoder to return an error if any unknown field is encountered
+	if err := decoder.Decode(&updatedTodo); err != nil {
 		utils.BadRequest(res, req, "invalid json")
 		return
 	}

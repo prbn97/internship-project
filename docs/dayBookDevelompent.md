@@ -259,3 +259,22 @@ func setupEnv(t *testing.T) (*TodoHandler, func()) {
 Today my focus in Error Handling reval that i have a problem with my PUT method, need fix that.
 
 Just then im getting back to handling bad request like using invalid ids when doing get by id.
+
+# May day 21 - **Focus Milestone 4: Error Handling**
+
+I found a problem in my PUT and POST methods. When I make a request and put one of the fields wrong, it doesn't show any error, it just ignores that wrong field...
+
+> example to make it clearer.
+```shell
+    curl --request POST \
+    --data '{"titl7e":"title", "description": "description example"}' \
+    http://localhost:8080/todos
+```
+
+it will create a toDO with an empty *"title"*... ​​and ignore the wrong field that I entered.
+
+The solution to this was to create a decoder and use the DisallowUnknownFields() function to check the request body
+```go
+decoder := json.NewDecoder(req.Body)
+	decoder.DisallowUnknownFields()
+```
