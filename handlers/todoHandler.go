@@ -73,6 +73,17 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 		utils.BadRequest(res, req, "invalid json")
 		return
 	}
+	// Ensure the ID is not provided by the user
+	if todo.ID != "" {
+		utils.BadRequest(res, req, "ID cannot be provided")
+		return
+	}
+
+	// Ensure the title is provided by the user
+	if todo.Title == "" {
+		utils.BadRequest(res, req, "title is required")
+		return
+	}
 
 	newID, err := GenerateID(20)
 	if err != nil {
@@ -160,6 +171,11 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 	decoder.DisallowUnknownFields() // this will cause decoder to return an error if any unknown field is encountered
 	if err := decoder.Decode(&updatedTodo); err != nil {
 		utils.BadRequest(res, req, "invalid json")
+		return
+	}
+	// Ensure the ID in the payload is not being updated
+	if updatedTodo.ID != "" && updatedTodo.ID != todoID {
+		utils.BadRequest(res, req, "ID cannot be updated")
 		return
 	}
 	if updatedTodo.Title != "" {

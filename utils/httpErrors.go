@@ -36,7 +36,7 @@ func Forbidden(res http.ResponseWriter, req *http.Request) {
 func NotFound(res http.ResponseWriter, req *http.Request, msg string) {
 	res.WriteHeader(http.StatusNotFound)
 	errorJson := models.TodoError{
-		Error:   "bad request",
+		Error:   "Not Found",
 		Message: msg,
 	}
 	jsonBytes, err := json.Marshal(errorJson)
