@@ -63,6 +63,7 @@ func (h *TodoHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("content-type", "application/json")
 	h.store.Lock()
 	defer h.store.Unlock()
 
@@ -105,6 +106,7 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *TodoHandler) List(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("content-type", "application/json")
 	h.store.RLock()
 	defer h.store.RUnlock()
 
@@ -123,6 +125,7 @@ func (h *TodoHandler) List(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *TodoHandler) Get(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("content-type", "application/json")
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 || len(matches[1]) != 20 {
 		utils.NotFound(res, req, "invalid ID")
@@ -149,6 +152,7 @@ func (h *TodoHandler) Get(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("content-type", "application/json")
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 || len(matches[1]) != 20 {
 		utils.NotFound(res, req, "invalid ID")
@@ -199,6 +203,7 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *TodoHandler) Delete(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("content-type", "application/json")
 	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 || len(matches[1]) != 20 {
 		utils.NotFound(res, req, "invalid ID")

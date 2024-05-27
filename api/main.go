@@ -2,25 +2,31 @@ package main
 
 import (
 	"api/main.go/handlers"
-	"fmt"
+	"log"
 	"net/http"
 )
 
 func main() {
-	mux := http.NewServeMux()
+	Port := ":8080"
+	ServeMux := http.NewServeMux()
+	loadRoutes(ServeMux)
 
-	setupHandlers(mux)
+	server := http.Server{
+		Addr:    Port,
+		Handler: ServeMux,
+	}
 
-	fmt.Println("API running at http://localhost:8080")
-	fmt.Println("Listening...")
-
-	http.ListenAndServe("localhost:8080", mux)
+	log.Printf("API running at http://localhost: %s", Port)
+	log.Print("Listening...")
+	server.ListenAndServe()
 }
 
-func setupHandlers(mux *http.ServeMux) {
+func loadRoutes(router *http.ServeMux) {
+	todoHandler := handlers.NewTodoHandler()
 
-	todoH := handlers.NewTodoHandler()
-
-	mux.Handle("/todos/", todoH) // /todos/{id}
-	mux.Handle("/todos", todoH)  // /todos
+	router.HandleFunc("POST /todos", todoHandler.Create)
+	router.HandleFunc("GET /todos/", todoHandler.List)
+	router.HandleFunc("GET /todos/{id}", todoHandler.Get)
+	router.HandleFunc("PUT /todos/{id}", todoHandler.Update)
+	router.HandleFunc("DELETE /todos/{id}", todoHandler.Delete)
 }
