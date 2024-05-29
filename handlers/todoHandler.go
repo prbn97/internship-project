@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	getTodoRegularExpression = regexp.MustCompile(`^/todos/([a-zA-Z0-9]+)/complete$`)
+	getTodoRegularExpression      = regexp.MustCompile(`^/todos/([a-zA-Z0-9]+)$`)
+	completeTodoRegularExpression = regexp.MustCompile(`^/todos/([a-zA-Z0-9]+)/complete$`)
 )
 
 type TodoDatastore struct {
@@ -202,7 +203,7 @@ func (h *TodoHandler) Delete(res http.ResponseWriter, req *http.Request) {
 
 func (h *TodoHandler) MarkComplete(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("content-type", "application/json")
-	matches := getTodoRegularExpression.FindStringSubmatch(req.URL.Path)
+	matches := completeTodoRegularExpression.FindStringSubmatch(req.URL.Path)
 	if len(matches) < 2 || len(matches[1]) != 20 {
 		utils.BadRequest(res, req, "invalid ID")
 		return

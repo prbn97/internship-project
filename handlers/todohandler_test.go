@@ -12,7 +12,6 @@ import (
 )
 
 func setupEnv(t *testing.T) (*TodoHandler, func(), []byte, models.Todo, []byte) {
-	// create todoHandler and toDos item
 	todoHandler := NewTodoHandler()
 
 	initialTodos := []models.Todo{
@@ -22,7 +21,6 @@ func setupEnv(t *testing.T) (*TodoHandler, func(), []byte, models.Todo, []byte) 
 
 	var todoItem models.Todo
 
-	// add initial Todos items in handler
 	for _, todo := range initialTodos {
 		todoJSON, err := json.Marshal(todo)
 		if err != nil {
@@ -31,7 +29,7 @@ func setupEnv(t *testing.T) (*TodoHandler, func(), []byte, models.Todo, []byte) 
 
 		postResponse := httptest.NewRecorder()
 		postRequest := httptest.NewRequest(http.MethodPost, "/todos", bytes.NewReader(todoJSON))
-		todoHandler.ServeHTTP(postResponse, postRequest)
+		todoHandler.Create(postResponse, postRequest)
 
 		response := postResponse.Result()
 		defer response.Body.Close()
@@ -43,11 +41,9 @@ func setupEnv(t *testing.T) (*TodoHandler, func(), []byte, models.Todo, []byte) 
 		if err := json.NewDecoder(response.Body).Decode(&createdTodo); err != nil {
 			t.Fatalf("error decoding response body: %v", err)
 		}
-		// Store the ID of the last created Todo
 		todoItem = createdTodo
 	}
 
-	// teardown for clear the todoHandler
 	teardown := func() {
 		todoHandler.store.Lock()
 		defer todoHandler.store.Unlock()
@@ -56,7 +52,6 @@ func setupEnv(t *testing.T) (*TodoHandler, func(), []byte, models.Todo, []byte) 
 		}
 	}
 
-	// New toDo
 	NewTodo := models.Todo{
 		Title:       "toDo #3",
 		Description: "Description field",
@@ -64,7 +59,6 @@ func setupEnv(t *testing.T) (*TodoHandler, func(), []byte, models.Todo, []byte) 
 	}
 	NewTodoJSON, _ := json.Marshal(NewTodo)
 
-	// Prepare toDo updated data
 	todoData := models.Todo{
 		Description: "Updated Description",
 		Completed:   true,
@@ -78,12 +72,10 @@ func TestTodoHandler_Create(t *testing.T) {
 	todoHandler, teardown, todoJSON, _, _ := setupEnv(t)
 	defer teardown()
 
-	// POST request (toDo #3)
 	postRequest := httptest.NewRequest(http.MethodPost, "/todos", bytes.NewBuffer(todoJSON))
 	postResponse := httptest.NewRecorder()
-	handler := http.HandlerFunc(todoHandler.ServeHTTP)
 
-	handler.ServeHTTP(postResponse, postRequest)
+	todoHandler.Create(postResponse, postRequest)
 
 	response := postResponse.Result()
 	defer response.Body.Close()
@@ -97,12 +89,10 @@ func TestTodoHandler_List(t *testing.T) {
 	todoHandler, teardown, _, _, _ := setupEnv(t)
 	defer teardown()
 
-	// Get request
 	getRequest := httptest.NewRequest(http.MethodGet, "/todos", nil)
 	getResponse := httptest.NewRecorder()
-	handler := http.HandlerFunc(todoHandler.ServeHTTP)
 
-	handler.ServeHTTP(getResponse, getRequest)
+	todoHandler.List(getResponse, getRequest)
 
 	response := getResponse.Result()
 	defer response.Body.Close()
@@ -130,10 +120,11 @@ func TestTodoHandler_Get(t *testing.T) {
 	todoHandler, teardown, _, createdTodo, _ := setupEnv(t)
 	defer teardown()
 
-	// GET request by id
 	getRequest := httptest.NewRequest(http.MethodGet, "/todos/"+createdTodo.ID, nil)
 	getResponse := httptest.NewRecorder()
-	todoHandler.ServeHTTP(getResponse, getRequest)
+
+	todoHandler.Get(getResponse, getRequest)
+
 	response := getResponse.Result()
 	defer response.Body.Close()
 
@@ -141,7 +132,6 @@ func TestTodoHandler_Get(t *testing.T) {
 		t.Fatalf("expected status code %d, got %d", http.StatusOK, response.StatusCode)
 	}
 
-	// Validate get response
 	var retrievedTodo models.Todo
 	if err := json.NewDecoder(response.Body).Decode(&retrievedTodo); err != nil {
 		t.Fatalf("error decoding response body: %v", err)
@@ -155,12 +145,10 @@ func TestTodoHandler_Update(t *testing.T) {
 	todoHandler, teardown, _, createdTodo, UpTodoJSON := setupEnv(t)
 	defer teardown()
 
-	// UPDATE by ID
 	putRequest := httptest.NewRequest(http.MethodPut, "/todos/"+createdTodo.ID, bytes.NewReader(UpTodoJSON))
 	putResponse := httptest.NewRecorder()
-	handler := http.HandlerFunc(todoHandler.ServeHTTP)
 
-	handler.ServeHTTP(putResponse, putRequest)
+	todoHandler.Update(putResponse, putRequest)
 
 	response := putResponse.Result()
 	defer response.Body.Close()
@@ -173,10 +161,10 @@ func TestTodoHandler_Delete(t *testing.T) {
 	todoHandler, teardown, _, createdTodo, _ := setupEnv(t)
 	defer teardown()
 
-	// DELETE by ID
 	delRequest := httptest.NewRequest(http.MethodDelete, "/todos/"+createdTodo.ID, nil)
 	delResponse := httptest.NewRecorder()
-	todoHandler.ServeHTTP(delResponse, delRequest)
+
+	todoHandler.Delete(delResponse, delRequest)
 
 	response := delResponse.Result()
 	defer response.Body.Close()
@@ -188,5 +176,30 @@ func TestTodoHandler_Delete(t *testing.T) {
 	_, exists := todoHandler.store.m[createdTodo.ID]
 	if exists {
 		t.Fatalf("todo was not deleted successfully")
+	}
+}
+
+func TestTodoHandler_MarkComplete(t *testing.T) {
+	todoHandler, teardown, _, createdTodo, _ := setupEnv(t)
+	defer teardown()
+
+	completeRequest := httptest.NewRequest(http.MethodPut, "/todos/"+createdTodo.ID+"/complete", nil)
+	completeResponse := httptest.NewRecorder()
+
+	todoHandler.MarkComplete(completeResponse, completeRequest)
+
+	response := completeResponse.Result()
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		t.Fatalf("expected status code %d, got %d", http.StatusOK, response.StatusCode)
+	}
+
+	var updatedTodo models.Todo
+	if err := json.NewDecoder(response.Body).Decode(&updatedTodo); err != nil {
+		t.Fatalf("error decoding response body: %v", err)
+	}
+	if !updatedTodo.Completed {
+		t.Errorf("expected todo to be marked as completed")
 	}
 }
