@@ -3,8 +3,38 @@ package utils
 import (
 	"api/main.go/models"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
 	"net/http"
+	"strings"
 )
+
+func HandleJSONDecodeError(res http.ResponseWriter, req *http.Request, err error) {
+	var syntaxError *json.SyntaxError
+	var unmarshalTypeError *json.UnmarshalTypeError
+
+	switch {
+	case errors.As(err, &syntaxError):
+		msg := fmt.Sprintf("Request body contains badly-formed JSON (at position %d)", syntaxError.Offset)
+		BadRequest(res, req, msg)
+	case errors.Is(err, io.ErrUnexpectedEOF):
+		msg := "Request body contains badly-formed JSON"
+		BadRequest(res, req, msg)
+	case errors.As(err, &unmarshalTypeError):
+		msg := fmt.Sprintf("Request body contains an invalid value for the %q field (at position %d)", unmarshalTypeError.Field, unmarshalTypeError.Offset)
+		BadRequest(res, req, msg)
+	case strings.HasPrefix(err.Error(), "json: unknown field "):
+		fieldName := strings.TrimPrefix(err.Error(), "json: unknown field ")
+		msg := fmt.Sprintf("Request body contains unknown field %s", fieldName)
+		BadRequest(res, req, msg)
+	case errors.Is(err, io.EOF):
+		msg := "Request body must not be empty"
+		BadRequest(res, req, msg)
+	default:
+		BadRequest(res, req, "Invalid JSON")
+	}
+}
 
 // 400
 func BadRequest(res http.ResponseWriter, req *http.Request, msg string) {

@@ -41,7 +41,7 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
 	decoder.DisallowUnknownFields() // this will cause decoder to return an error if any unknown field is encountered
 	if err := decoder.Decode(&todo); err != nil {
-		utils.BadRequest(res, req, "invalid json")
+		utils.HandleJSONDecodeError(res, req, err)
 		return
 	}
 	// Ensure the ID is not provided by the user
@@ -144,7 +144,7 @@ func (h *TodoHandler) Update(res http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
 	decoder.DisallowUnknownFields() // this will cause decoder to return an error if any unknown field is encountered
 	if err := decoder.Decode(&updatedTodo); err != nil {
-		utils.BadRequest(res, req, "invalid json")
+		utils.HandleJSONDecodeError(res, req, err)
 		return
 	}
 	// Ensure the ID in the payload is not being updated
