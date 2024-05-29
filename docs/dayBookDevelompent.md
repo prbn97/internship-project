@@ -10,7 +10,7 @@ Sumary
 
 
 
-## April day 22 - What is a API?
+# April day 22 - *What is a API?*
 Last Friday I received the task of developing a Rest API.
 
 We received a recommendation from a friend to use OpenAPI to plan the entire API,
@@ -19,17 +19,17 @@ Therefore, my focus was to better understand the concept and history of the API,
 OpenAPI, in short, plans an entire API, in addition to the documentation. This produces a professional application. However, the focus is not on the principle of an API.
 
 
-## April day 24 - Getting API's examples
+# April day 24 - *Getting API's examples*
 I searched for *examples of api rest in Go* on the internet to create my own. I didn't find much useful due to the use of frameworks. I would like to understand in a more conceptual way
 > I should have tried better, as the days went by, I did it.
 
 
-## April day 27 of aprill - Get some milestones
+# April day 27 of aprill - *Get some milestones*
 Starting to execute the first items of the first defined milestone. Creating the structure of the entire item and seeking to better understand through practical examples how an API works, how its structure is organized.
 
-## April day 29  - Focus on develompment
+# April day 29  - *Focus on develompment*
 
-# April day 30 - First Structure
+# April day 30 - *First Structure*
 The first structure that i follow.
 
     /todo-api/
@@ -53,9 +53,9 @@ The first structure that i follow.
 [Find this content](https://www.alura.com.br/conteudo/go-desenvolvendo-api-rest)
 Helps me alot.
 
-## May day 2 - Focus on development 
+# May day 2 - *Focus on development* 
 
-# May day 3 - Focus on *Milestone 1* and *Milestone 2* 
+# May day 3 - *Focus on Milestone 1 and Milestone 2*
 
 + ## **fetaure - createDate and limitDate**
     - todo item have the date that the item was created, and the date limmit to be done.
@@ -112,12 +112,12 @@ ServeMux is an HTTP request multiplexer. It matches the URL of each incoming req
 ### Start a http.ServMux() 
 
 
-# May day 5 - Focus on development 
+# May day 5 - *Focus on development* 
 
 the videdo make me do a user_handler that can be use for and user of the ToDO items JSON [Web Tokens](https://www.alura.com.br/artigos/o-que-e-json-web-tokensg)
 
 
-# May day 6 - Focus on development 
+# May day 6 - *Focus on development*
 The todo_handler now are done. need 
 
 ## [need to focus on tests.](https://www.youtube.com/watch?v=xhgHeAhxizE)
@@ -159,7 +159,7 @@ The new structure that i will follow.
         - Makefile
         -README.md
 
-# May day 7 - Focus on test development 
+# May day 7 - *Focus on test development*
 
 ### Neet create unit tests to my heandler... and then create bigger test.
  Need check all milestones. Just then, add some feature.
@@ -180,7 +180,7 @@ ___
 
 [Go JWT Authentication Tutorial](https://www.youtube.com/watch?v=Qk6UgCps5Dc&t)
 
-# May day 13 - Focus on test development
+# May day 13 - *Focus on test development*
 
 Problem with mi tests
 
@@ -224,7 +224,7 @@ func (h *TodoHandler) Create(res http.ResponseWriter, req *http.Request) {
 }
 ```
 
-# May day 15 - Focus on test development
+# May day 15 - *Focus on test development*
 
 Talking to Gui about my API, we saw that I can make my test smaller and clearer, we talked about setting up environment.
 
@@ -254,13 +254,13 @@ func setupEnv(t *testing.T) (*TodoHandler, func()) {
 ```
 
 
-# May day 20 - **Focus Milestone 4: Error Handling**
+# May day 20 - *Focus Milestone 4: Error Handling*
 
 Today my focus in Error Handling reval that i have a problem with my PUT method, need fix that.
 
 Just then im getting back to handling bad request like using invalid ids when doing get by id.
 
-# May day 21 - **Focus Milestone 4: Error Handling**
+# May day 21 - *Focus Milestone 4: Error Handling*
 
 ## bug fixing - DisallowUnknownFields()
 I found a problem in my PUT and POST methods. When I make a request and put one of the fields wrong, it doesn't show any error, it just ignores that wrong field...
@@ -296,6 +296,25 @@ case req.Method == http.MethodGet: // && getTodoRegularExpression.MatchString(re
 		h.Get(res, req)
 		return
 ```
-> i comment the second condition and let the function validate if the id called is valid or not
+    i comment the second condition and let the function validate if the id called is valid or not
 
 
+# May day 23 - *FeedBack & Go 1.22*
+
+That afternoon I received feedback from my mentor, I made a presentation (which could have been better) of my API project.
+
+## FeedBack - Some points that were raised.
+
+- Define mandatory field when creating the whole (title proprietie)
+- Use T.Run to improve the test (use to make success and failure cases).
+- Update toDo status (completed: false-true) without the need to insert data with json (call with id).
+- Precisely define the client's error (such as informing which json field was entered incorrectly)
+
+## Go 1.22 
+
+In the same feedback, Vicentin, one of the team members, talked about new updates to the go net/http standard library package and showed me this video [new fetaure of GO 1.22](https://www.youtube.com/watch?v=H7tbjKFSg58&t), it will make the code easier and simpler [this repo](https://github.com/dreamsofcode-io/nethttp/blob/main/router.go) was helpful
+
+
+# May day 27 - *Focus on Error Handling and refactor tests*
+
+With the changes I made, I no longer use the ServeHTTP function, so I need to refactor the test, taking the opportunity to improve it using the T.Run feature.
