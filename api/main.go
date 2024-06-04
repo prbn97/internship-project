@@ -1,7 +1,7 @@
 package main
 
 import (
-	"api/main.go/handlers"
+	"api/main.go/services/task"
 	"log"
 	"net/http"
 )
@@ -9,7 +9,8 @@ import (
 func main() {
 	Port := ":8080"
 	ServeMux := http.NewServeMux()
-	loadRoutes(ServeMux)
+	taskHandler := task.NewHandler()
+	taskHandler.RegisterRoutes(ServeMux)
 
 	server := http.Server{
 		Addr:    Port,
@@ -19,15 +20,4 @@ func main() {
 	log.Printf("API running at http://localhost%s", Port)
 	log.Print("Listening...")
 	server.ListenAndServe()
-}
-
-func loadRoutes(serv *http.ServeMux) {
-	todoHandler := handlers.NewTodoHandler()
-
-	serv.HandleFunc("POST /todos", todoHandler.Create)
-	serv.HandleFunc("GET /todos/", todoHandler.List)
-	serv.HandleFunc("GET /todos/{id}", todoHandler.Get)
-	serv.HandleFunc("PUT /todos/{id}", todoHandler.Update)
-	serv.HandleFunc("DELETE /todos/{id}", todoHandler.Delete)
-	serv.HandleFunc("PUT /todos/{id}/complete", todoHandler.MarkComplete)
 }

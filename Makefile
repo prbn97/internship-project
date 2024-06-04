@@ -1,4 +1,4 @@
-BINARY_NAME=todo-api
+BINARY_NAME=api-serv
 
 .PHONY: run
 run: build
