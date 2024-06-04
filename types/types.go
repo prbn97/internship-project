@@ -1,6 +1,6 @@
 package types
 
-type CreateTaskPlayLoad struct {
+type TaskPayLoad struct {
 	Title       string `json:"title" validate:"required"`
 	Description string `json:"description"`
 }
@@ -10,4 +10,12 @@ type Task struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Completed   bool   `json:"completed"`
+}
+
+type TaskStore interface {
+	CreateTask(TaskPayLoad) error
+	ListTasks() ([]*Task, error)
+	GetTaskByID(id string) (*Task, error)
+	UpdateTask(Task) error
+	DeleteTask(id string) (Task, error)
 }

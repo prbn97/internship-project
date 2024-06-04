@@ -319,4 +319,4 @@ In the same feedback, Vicentin, one of the team members, talked about new update
 
 With the changes I made, I no longer use the ServeHTTP function, so I need to refactor the test, taking the opportunity to improve it using the T.Run feature.
 
-# June day 01 - 
+# June day 03 - 
