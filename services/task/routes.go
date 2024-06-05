@@ -5,8 +5,6 @@ import (
 	"cmd/main.go/utils"
 	"fmt"
 	"net/http"
-
-	"github.com/go-playground/validator"
 )
 
 type Handler struct {
@@ -18,6 +16,8 @@ func NewHandler(store types.TaskStore) *Handler {
 		store: store,
 	}
 }
+
+// go 1.22 feature "Method based routing"
 func (h *Handler) RegisterRoutes(serv *http.ServeMux) {
 	serv.HandleFunc("POST /tasks", h.taskPOST)
 	serv.HandleFunc("GET /tasks", h.taskLIST)
@@ -28,6 +28,7 @@ func (h *Handler) RegisterRoutes(serv *http.ServeMux) {
 }
 
 func validateID(r *http.Request) (string, error) {
+	// go 1.22 feature PathValue returns the value "path wildcard"
 	id := r.PathValue("id")
 	if len(id) != 20 {
 		return "", fmt.Errorf("invalid id")
@@ -46,12 +47,6 @@ func (h *Handler) taskPOST(w http.ResponseWriter, r *http.Request) {
 
 	if task.Title == "" {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("task title is required"))
-		return
-	}
-
-	if err := utils.Validate.Struct(task); err != nil {
-		errors := err.(validator.ValidationErrors)
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload: %v", errors))
 		return
 	}
 
