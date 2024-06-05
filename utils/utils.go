@@ -1,13 +1,9 @@
 package utils
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -32,36 +28,11 @@ func ParseJSON(r *http.Request, v any) error {
 	return json.NewDecoder(r.Body).Decode(v)
 }
 
-func GenerateID(length int) (string, error) {
-	if length <= 0 {
-		return "", errors.New("invalid length")
+func ValidateFields(w http.ResponseWriter, r *http.Request, v any) error {
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&v); err != nil {
+		return err
 	}
-	numBytes := length / 2
-	if length%2 != 0 {
-		numBytes++
-	}
-	randomBytes := make([]byte, numBytes)
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		return "", err
-	}
-
-	id := hex.EncodeToString(randomBytes)
-
-	if len(id) > length {
-		id = id[:length]
-	} else if len(id) < length {
-		id += strings.Repeat("0", length-len(id))
-	}
-
-	return id, nil
+	return nil
 }
-
-// func TestGenerateID(t *testing.T) {
-// 	id, err := GenerateID(20)
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, 20, len(id))
-
-// 	_, err = GenerateID(-25)
-// 	assert.Error(t, err)
-// }

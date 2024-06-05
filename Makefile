@@ -1,4 +1,4 @@
-BINARY_NAME=api-serv
+BINARY_NAME=serv-API
 
 .PHONY: run
 run: build
@@ -6,7 +6,7 @@ run: build
 
 .PHONY: build
 build:
-	go build -o $(BINARY_NAME) ./api/
+	go build -o $(BINARY_NAME) ./cmd/
 
 .PHONY: test
 test:

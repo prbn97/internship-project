@@ -1,13 +1,16 @@
 package task
 
 import (
-	"api/main.go/types"
-	"api/main.go/utils"
+	"cmd/main.go/types"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Store struct {
@@ -67,8 +70,41 @@ func (s *Store) saveTasks() error {
 	return nil
 }
 
+func generateID(length int) (string, error) {
+	if length <= 0 {
+		return "", errors.New("invalid length")
+	}
+	numBytes := length / 2
+	if length%2 != 0 {
+		numBytes++
+	}
+	randomBytes := make([]byte, numBytes)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		return "", err
+	}
+
+	id := hex.EncodeToString(randomBytes)
+
+	if len(id) > length {
+		id = id[:length]
+	} else if len(id) < length {
+		id += strings.Repeat("0", length-len(id))
+	}
+
+	return id, nil
+}
+
+// func TestGenerateID(t *testing.T) {
+// 	id, err := GenerateID(20)
+// 	assert.NoError(t, err)
+// 	assert.Equal(t, 20, len(id))
+// 	_, err = GenerateID(-25)
+// 	assert.Error(t, err)
+// }
+
 func (s *Store) CreateTask(payload types.TaskPayLoad) error {
-	id, err := utils.GenerateID(20)
+	id, err := generateID(20)
 	if err != nil {
 		return err
 	}

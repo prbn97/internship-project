@@ -1,9 +1,8 @@
 package task
 
 import (
-	"api/main.go/types"
-	"api/main.go/utils"
-	"encoding/json"
+	"cmd/main.go/types"
+	"cmd/main.go/utils"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -12,8 +11,8 @@ import (
 )
 
 var (
-	getTodoRegularExpression      = regexp.MustCompile(`^/todos/([a-zA-Z0-9]+)$`)
-	completeTodoRegularExpression = regexp.MustCompile(`^/todos/([a-zA-Z0-9]+)/complete$`)
+	getTodoRegularExpression      = regexp.MustCompile(`^/tasks/([a-zA-Z0-9]+)$`)
+	completeTodoRegularExpression = regexp.MustCompile(`^/tasks/([a-zA-Z0-9]+)/complete$`)
 )
 
 type Handler struct {
@@ -26,18 +25,26 @@ func NewHandler(store types.TaskStore) *Handler {
 	}
 }
 func (h *Handler) RegisterRoutes(serv *http.ServeMux) {
-	serv.HandleFunc("POST /todos", h.taskPOST)
-	serv.HandleFunc("GET /todos", h.taskLIST)
-	serv.HandleFunc("GET /todos/{id}", h.taskGET)
-	serv.HandleFunc("PUT /todos/{id}", h.taskPUT)
-	serv.HandleFunc("DELETE /todos/{id}", h.taskDELETE)
-	serv.HandleFunc("PUT /todos/{id}/complete", h.taskComplete)
+	serv.HandleFunc("POST /tasks", h.taskPOST)
+	serv.HandleFunc("GET /tasks", h.taskLIST)
+	serv.HandleFunc("GET /tasks/{id}", h.taskGET)
+	serv.HandleFunc("PUT /tasks/{id}", h.taskPUT)
+	serv.HandleFunc("DELETE /tasks/{id}", h.taskDELETE)
+	serv.HandleFunc("PUT /tasks/{id}/complete", h.taskComplete)
 }
 
 func (h *Handler) taskPOST(w http.ResponseWriter, r *http.Request) {
+
 	var task types.TaskPayLoad
-	if err := utils.ParseJSON(r, &task); err != nil {
+
+	err := utils.ValidateFields(w, r, &task)
+	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if task.Title == "" {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("task title is required"))
 		return
 	}
 
@@ -47,7 +54,7 @@ func (h *Handler) taskPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.store.CreateTask(task)
+	err = h.store.CreateTask(task)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
@@ -97,27 +104,24 @@ func (h *Handler) taskPUT(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var updatedTask types.Task
-	decoder := json.NewDecoder(r.Body)
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&updatedTask); err != nil {
+	var updatedTask types.TaskPayLoad
+
+	err = utils.ValidateFields(w, r, &updatedTask)
+	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	if updatedTask.ID != "" && updatedTask.ID != matches[1] {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("cant change id"))
+	if updatedTask.Title == "" {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("task title is required"))
 		return
 	}
 
-	if updatedTask.Title != "" {
+	if updatedTask.Title != task.Title {
 		task.Title = updatedTask.Title
 	}
 	if updatedTask.Description != task.Description {
 		task.Description = updatedTask.Description
-	}
-	if updatedTask.Completed != task.Completed {
-		task.Completed = updatedTask.Completed
 	}
 
 	err = h.store.UpdateTask(*task)
@@ -161,12 +165,12 @@ func (h *Handler) taskComplete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if task.Completed {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("this task completed"))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("this task is already completed"))
 		return
 	}
 
 	task.Completed = true
-	err = h.store.UpdateTask(types.Task{})
+	err = h.store.UpdateTask(*task)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
