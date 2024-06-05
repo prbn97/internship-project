@@ -5,14 +5,8 @@ import (
 	"cmd/main.go/utils"
 	"fmt"
 	"net/http"
-	"regexp"
 
 	"github.com/go-playground/validator"
-)
-
-var (
-	getTodoRegularExpression      = regexp.MustCompile(`^/tasks/([a-zA-Z0-9]+)$`)
-	completeTodoRegularExpression = regexp.MustCompile(`^/tasks/([a-zA-Z0-9]+)/complete$`)
 )
 
 type Handler struct {
@@ -33,10 +27,17 @@ func (h *Handler) RegisterRoutes(serv *http.ServeMux) {
 	serv.HandleFunc("PUT /tasks/{id}/complete", h.taskComplete)
 }
 
+func validateID(r *http.Request) (string, error) {
+	id := r.PathValue("id")
+	if len(id) != 20 {
+		return "", fmt.Errorf("invalid id")
+	}
+	return id, nil
+}
+
 func (h *Handler) taskPOST(w http.ResponseWriter, r *http.Request) {
 
 	var task types.TaskPayLoad
-
 	err := utils.ValidateFields(w, r, &task)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
@@ -75,13 +76,14 @@ func (h *Handler) taskLIST(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) taskGET(w http.ResponseWriter, r *http.Request) {
-	matches := getTodoRegularExpression.FindStringSubmatch(r.URL.Path)
-	if len(matches) < 2 || len(matches[1]) != 20 {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid id"))
+
+	id, err := validateID(r)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	task, err := h.store.GetTaskByID(matches[1])
+	task, err := h.store.GetTaskByID(id)
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, err)
 		return
@@ -92,31 +94,27 @@ func (h *Handler) taskGET(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) taskPUT(w http.ResponseWriter, r *http.Request) {
 
-	matches := getTodoRegularExpression.FindStringSubmatch(r.URL.Path)
-	if len(matches) < 2 || len(matches[1]) != 20 {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid id"))
+	id, err := validateID(r)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
-
-	task, err := h.store.GetTaskByID(matches[1])
+	task, err := h.store.GetTaskByID(id)
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("not found id"))
 		return
 	}
 
 	var updatedTask types.TaskPayLoad
-
 	err = utils.ValidateFields(w, r, &updatedTask)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
-
 	if updatedTask.Title == "" {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("task title is required"))
 		return
 	}
-
 	if updatedTask.Title != task.Title {
 		task.Title = updatedTask.Title
 	}
@@ -135,13 +133,13 @@ func (h *Handler) taskPUT(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) taskDELETE(w http.ResponseWriter, r *http.Request) {
 
-	matches := getTodoRegularExpression.FindStringSubmatch(r.URL.Path)
-	if len(matches) < 2 || len(matches[1]) != 20 {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid id"))
+	id, err := validateID(r)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	task, err := h.store.DeleteTask(matches[1])
+	task, err := h.store.DeleteTask(id)
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("not found id"))
 		return
@@ -151,14 +149,13 @@ func (h *Handler) taskDELETE(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) taskComplete(w http.ResponseWriter, r *http.Request) {
-
-	matches := completeTodoRegularExpression.FindStringSubmatch(r.URL.Path)
-	if len(matches) < 2 || len(matches[1]) != 20 {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid id"))
+	id, err := validateID(r)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	task, err := h.store.GetTaskByID(matches[1])
+	task, err := h.store.GetTaskByID(id)
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("not found id"))
 		return
