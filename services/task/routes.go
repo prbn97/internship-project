@@ -25,6 +25,7 @@ func (h *Handler) RegisterRoutes(serv *http.ServeMux) {
 	serv.HandleFunc("PUT /tasks/{id}", h.taskPUT)
 	serv.HandleFunc("DELETE /tasks/{id}", h.taskDELETE)
 	serv.HandleFunc("PUT /tasks/{id}/complete", h.taskComplete)
+	serv.HandleFunc("PUT /tasks/{id}/incomplete", h.taskIncomplete)
 }
 
 func validateID(r *http.Request) (string, error) {
@@ -159,12 +160,40 @@ func (h *Handler) taskComplete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if task.Completed {
+	if task.Status {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("this task is already completed"))
 		return
 	}
 
-	task.Completed = true
+	task.Status = true
+	err = h.store.UpdateTask(*task)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, task)
+}
+
+func (h *Handler) taskIncomplete(w http.ResponseWriter, r *http.Request) {
+	id, err := validateID(r)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	task, err := h.store.GetTaskByID(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("not found id"))
+		return
+	}
+
+	if !task.Status {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("this task is already incompleted"))
+		return
+	}
+
+	task.Status = false
 	err = h.store.UpdateTask(*task)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)

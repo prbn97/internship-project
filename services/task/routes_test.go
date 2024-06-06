@@ -171,6 +171,8 @@ func TestTaskHandlers(t *testing.T) {
 			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, rr.Code)
 		}
 	})
+
+	// PUT /{id}/complete
 	t.Run("should handler complete task", func(t *testing.T) {
 		req, err := http.NewRequest("PUT", "/tasks/89d9777c857a7fc95844/complete", nil)
 		if err != nil {
@@ -181,6 +183,92 @@ func TestTaskHandlers(t *testing.T) {
 
 		if rr.Code != http.StatusOK {
 			t.Errorf("expected status code %d, got %d", http.StatusOK, rr.Code)
+		}
+	})
+	t.Run("shouldn't handler complete task", func(t *testing.T) {
+		req, err := http.NewRequest("PUT", "/tasks/89d9777c857a7fc95844/complete", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, rr.Code)
+		}
+	})
+	t.Run("shouldn't handler complete task with invalid ID", func(t *testing.T) {
+		req, err := http.NewRequest("PUT", "/tasks/invalid_ID/complete", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, rr.Code)
+		}
+	})
+	t.Run("shouldn't handler complete task that don't exist", func(t *testing.T) {
+		req, err := http.NewRequest("PUT", "/tasks/77d77777c777a7fc7777/complete", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusNotFound {
+			t.Errorf("expected status code %d, got %d", http.StatusNotFound, rr.Code)
+		}
+	})
+
+	// PUT /{id}/incomplete
+	t.Run("should handler incomplete task", func(t *testing.T) {
+		req, err := http.NewRequest("PUT", "/tasks/89d9777c857a7fc95844/incomplete", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Errorf("expected status code %d, got %d", http.StatusOK, rr.Code)
+		}
+	})
+	t.Run("shouldn't handler incomplete task", func(t *testing.T) {
+		req, err := http.NewRequest("PUT", "/tasks/89d9777c857a7fc95844/incomplete", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, rr.Code)
+		}
+	})
+	t.Run("shouldn't handler incomplete task with invalid ID", func(t *testing.T) {
+		req, err := http.NewRequest("PUT", "/tasks/invalid_ID/incomplete", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, rr.Code)
+		}
+	})
+	t.Run("shouldn't handler incomplete task that don't exist", func(t *testing.T) {
+		req, err := http.NewRequest("PUT", "/tasks/77d77777c777a7fc7777/incomplete", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusNotFound {
+			t.Errorf("expected status code %d, got %d", http.StatusNotFound, rr.Code)
 		}
 	})
 
@@ -233,7 +321,7 @@ func (m *mockTaskStore) CreateTask(payload types.TaskPayLoad) error {
 		ID:          id,
 		Title:       payload.Title,
 		Description: payload.Title,
-		Completed:   false,
+		Status:      false,
 	}
 	m.tasks[id] = task
 	return nil

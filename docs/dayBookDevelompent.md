@@ -309,7 +309,7 @@ In the same feedback, Vicentin, one of the team members, talked about new update
 
 With the changes I made, I no longer use the ServeHTTP function, so I need to refactor the test, taking the opportunity to improve it using the T.Run feature.
 
-# June day 04 -  *Milestone 5: Documentation and API Refinement*
+# June day 04 -  *Milestone 5: API Refinement*
 
 On day 3 I spoke to my tutor, I showed him an architecture of an API separated into layers to be more modularized.
 The study was very interesting. I found a guy called [Tiago](https://www.youtube.com/watch?v=OVwUldzmVOg&t=353s), Portuguese with great content in Go.
@@ -432,4 +432,6 @@ usar o recurso de path parameters da nova versão go 1.22 (removendo as varriave
 
 Usar OpenAPI e criar a documentação
 
-# June day 05
+# June day 05 - *Milestone 5: Documentation*
+
+Now focus on documentation, using OpenAPI and mermaid to make a good documentation
