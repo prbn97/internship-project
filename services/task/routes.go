@@ -160,12 +160,12 @@ func (h *Handler) taskComplete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if task.Status {
+	if task.Completed {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("this task is already completed"))
 		return
 	}
 
-	task.Status = true
+	task.Completed = true
 	err = h.store.UpdateTask(*task)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
@@ -188,12 +188,12 @@ func (h *Handler) taskIncomplete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !task.Status {
+	if !task.Completed {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("this task is already incompleted"))
 		return
 	}
 
-	task.Status = false
+	task.Completed = false
 	err = h.store.UpdateTask(*task)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)

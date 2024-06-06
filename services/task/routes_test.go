@@ -321,7 +321,7 @@ func (m *mockTaskStore) CreateTask(payload types.TaskPayLoad) error {
 		ID:          id,
 		Title:       payload.Title,
 		Description: payload.Title,
-		Status:      false,
+		Completed:   false,
 	}
 	m.tasks[id] = task
 	return nil

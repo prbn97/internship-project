@@ -113,7 +113,7 @@ func (s *Store) CreateTask(payload types.TaskPayLoad) error {
 		ID:          id,
 		Title:       payload.Title,
 		Description: payload.Description,
-		Status:      false,
+		Completed:   false,
 	}
 
 	s.tasks[id] = task

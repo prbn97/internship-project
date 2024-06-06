@@ -9,7 +9,7 @@ type Task struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	Status      bool   `json:"completed"`
+	Completed   bool   `json:"completed"`
 }
 
 type TaskStore interface {
