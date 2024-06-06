@@ -16,6 +16,7 @@ func TestTaskHandlers(t *testing.T) {
 	mux := http.NewServeMux()
 	handler.RegisterRoutes(mux)
 
+	// POST
 	t.Run("should handler create task", func(t *testing.T) {
 		payload := types.TaskPayLoad{
 			Title:       "Test Task",
@@ -33,7 +34,7 @@ func TestTaskHandlers(t *testing.T) {
 			t.Errorf("expected status code %d, got %d", http.StatusCreated, rr.Code)
 		}
 	})
-	t.Run("shouldn't handler create task if the title is blank", func(t *testing.T) {
+	t.Run("shouldn't handler create task if the title field is empty", func(t *testing.T) {
 		payload := types.TaskPayLoad{
 			Title:       "",
 			Description: "This is a test task",
@@ -51,7 +52,8 @@ func TestTaskHandlers(t *testing.T) {
 		}
 	})
 
-	t.Run("should handler list tasks", func(t *testing.T) {
+	// GET
+	t.Run("should handler get tasks", func(t *testing.T) {
 		req, err := http.NewRequest("GET", "/tasks", nil)
 		if err != nil {
 			t.Fatal(err)
@@ -63,7 +65,6 @@ func TestTaskHandlers(t *testing.T) {
 			t.Errorf("expected status code %d, got %d", http.StatusOK, rr.Code)
 		}
 	})
-
 	t.Run("should handler get task by ID", func(t *testing.T) {
 		req, err := http.NewRequest("GET", "/tasks/89d9777c857a7fc95844", nil)
 		if err != nil {
@@ -88,7 +89,20 @@ func TestTaskHandlers(t *testing.T) {
 			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, rr.Code)
 		}
 	})
+	t.Run("shouldn't handler get task that don't exist", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/tasks/77d77777c777a7fc7777", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
 
+		if rr.Code != http.StatusNotFound {
+			t.Errorf("expected status code %d, got %d", http.StatusNotFound, rr.Code)
+		}
+	})
+
+	// PUT
 	t.Run("should handler update task", func(t *testing.T) {
 		payload := types.TaskPayLoad{
 			Title:       "Updated Task Title",
@@ -106,13 +120,47 @@ func TestTaskHandlers(t *testing.T) {
 			t.Errorf("expected status code %d, got %d", http.StatusOK, rr.Code)
 		}
 	})
-	t.Run("shouldn't handler update task if the title is blank", func(t *testing.T) {
+	t.Run("should handler update task if only description was given", func(t *testing.T) {
 		payload := types.TaskPayLoad{
 			Title:       "",
-			Description: "Updated task description",
+			Description: "Updated only the description",
 		}
 		body, _ := json.Marshal(payload)
 		req, err := http.NewRequest("PUT", "/tasks/89d9777c857a7fc95844", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Errorf("expected status code %d, got %d", http.StatusOK, rr.Code)
+		}
+	})
+	t.Run("shouldn't handler update task that don't exist", func(t *testing.T) {
+		payload := types.TaskPayLoad{
+			Title:       "Updated Task Title",
+			Description: "Updated task description",
+		}
+		body, _ := json.Marshal(payload)
+		req, err := http.NewRequest("PUT", "/tasks/77d77777c777a7fc7777", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusNotFound {
+			t.Errorf("expected status code %d, got %d", http.StatusNotFound, rr.Code)
+		}
+	})
+	t.Run("shouldn't handler update task that don't exist", func(t *testing.T) {
+		payload := types.TaskPayLoad{
+			Title:       "Updated Task Title",
+			Description: "Updated task description",
+		}
+		body, _ := json.Marshal(payload)
+		req, err := http.NewRequest("PUT", "/tasks/invalid_ID", bytes.NewReader(body))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -123,7 +171,6 @@ func TestTaskHandlers(t *testing.T) {
 			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, rr.Code)
 		}
 	})
-
 	t.Run("should handler complete task", func(t *testing.T) {
 		req, err := http.NewRequest("PUT", "/tasks/89d9777c857a7fc95844/complete", nil)
 		if err != nil {
@@ -137,6 +184,7 @@ func TestTaskHandlers(t *testing.T) {
 		}
 	})
 
+	// DELETE
 	t.Run("should handler delete task", func(t *testing.T) {
 		req, err := http.NewRequest("DELETE", "/tasks/89d9777c857a7fc95844", nil)
 		if err != nil {
@@ -161,6 +209,18 @@ func TestTaskHandlers(t *testing.T) {
 			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, rr.Code)
 		}
 	})
+	t.Run("shouldn't handler delete task that don't exist", func(t *testing.T) {
+		req, err := http.NewRequest("DELETE", "/tasks/77d77777c777a7fc7777", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusNotFound {
+			t.Errorf("expected status code %d, got %d", http.StatusNotFound, rr.Code)
+		}
+	})
 }
 
 type mockTaskStore struct {
@@ -172,13 +232,12 @@ func (m *mockTaskStore) CreateTask(payload types.TaskPayLoad) error {
 	task := types.Task{
 		ID:          id,
 		Title:       payload.Title,
-		Description: payload.Description,
+		Description: payload.Title,
 		Completed:   false,
 	}
 	m.tasks[id] = task
 	return nil
 }
-
 func (m *mockTaskStore) ListTasks() ([]*types.Task, error) {
 	tasks := make([]*types.Task, 0, len(m.tasks))
 	for _, task := range m.tasks {
@@ -186,7 +245,6 @@ func (m *mockTaskStore) ListTasks() ([]*types.Task, error) {
 	}
 	return tasks, nil
 }
-
 func (m *mockTaskStore) GetTaskByID(id string) (*types.Task, error) {
 	task, exists := m.tasks[id]
 	if !exists {
@@ -194,12 +252,10 @@ func (m *mockTaskStore) GetTaskByID(id string) (*types.Task, error) {
 	}
 	return &task, nil
 }
-
 func (m *mockTaskStore) UpdateTask(task types.Task) error {
 	m.tasks[task.ID] = task
 	return nil
 }
-
 func (m *mockTaskStore) DeleteTask(id string) (types.Task, error) {
 	task, exists := m.tasks[id]
 	if !exists {

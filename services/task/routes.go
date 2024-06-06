@@ -94,21 +94,24 @@ func (h *Handler) taskPUT(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
-	task, err := h.store.GetTaskByID(id)
-	if err != nil {
-		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("not found id"))
-		return
-	}
-
 	var updatedTask types.TaskPayLoad
 	err = utils.ValidateFields(w, r, &updatedTask)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
-	if updatedTask.Title == "" {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("task title is required"))
+	task, err := h.store.GetTaskByID(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("not found id"))
 		return
+	}
+
+	if updatedTask.Title == "" && updatedTask.Description == task.Description {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("at least a new task description field must be provided"))
+		return
+	}
+	if updatedTask.Title == "" {
+		updatedTask.Title = task.Title
 	}
 	if updatedTask.Title != task.Title {
 		task.Title = updatedTask.Title
