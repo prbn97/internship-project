@@ -9,7 +9,7 @@ import (
 	"github.com/prbn97/internship-project/services/task"
 )
 
-const port = 3003
+const port = 8080
 
 func main() {
 
@@ -21,16 +21,16 @@ func main() {
 	}
 
 	// build API routes
-	mux := http.NewServeMux()
+	handler := http.NewServeMux()
 	taskHandler := task.NewHandler(tasksDB)
-	taskHandler.RegisterRoutes(mux)
+	taskHandler.RegisterRoutes(handler)
 
 	// servs info
 	log.Printf("API running at http://localhost:%d/", port)
 	log.Print("Listening...")
 
 	// start the server
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), handler); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 
