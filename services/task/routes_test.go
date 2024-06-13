@@ -2,12 +2,13 @@ package task
 
 import (
 	"bytes"
-	"cmd/main.go/types"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/prbn97/internship-project/types"
 )
 
 func TestTaskHandlers(t *testing.T) {

@@ -1,10 +1,11 @@
 package task
 
 import (
-	"cmd/main.go/types"
-	"cmd/main.go/utils"
 	"fmt"
 	"net/http"
+
+	"github.com/prbn97/internship-project/types"
+	"github.com/prbn97/internship-project/utils"
 )
 
 type Handler struct {

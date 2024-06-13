@@ -1,7 +1,6 @@
 package task
 
 import (
-	"cmd/main.go/types"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -11,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/prbn97/internship-project/types"
 )
 
 type Store struct {

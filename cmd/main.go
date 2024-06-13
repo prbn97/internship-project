@@ -1,37 +1,37 @@
 package main
 
 import (
-	"cmd/main.go/services/task"
+	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/prbn97/internship-project/services/task"
 )
+
+const port = 3003
 
 func main() {
 
-	// environment config
-	Port := ":8080"
-	mux := http.NewServeMux()
-	server := http.Server{
-		Addr:    Port,
-		Handler: mux,
-	}
-
-	// build API storage service
+	// build storage
 	dbPath := filepath.Join("db", "tasksStore.json")
 	tasksDB, err := task.NewStore(dbPath)
 	if err != nil {
 		log.Fatalf("Failed to initialize task store: %v", err)
 	}
 
-	// build API routes services
-	hTask := task.NewHandler(tasksDB)
-	hTask.RegisterRoutes(mux)
+	// build API routes
+	mux := http.NewServeMux()
+	taskHandler := task.NewHandler(tasksDB)
+	taskHandler.RegisterRoutes(mux)
 
 	// servs info
-	log.Printf("API running at http://localhost%s/", Port)
+	log.Printf("API running at http://localhost:%d/", port)
 	log.Print("Listening...")
 
-	server.ListenAndServe()
+	// start the server
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 
 }

@@ -1,3 +1,3 @@
-module cmd/main.go
+module github.com/prbn97/internship-project
 
-go 1.22
+go 1.22.0
