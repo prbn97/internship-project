@@ -20,11 +20,12 @@ func NewHandler(store types.TaskStore) *Handler {
 
 // go 1.22 feature "Method based routing"
 func (h *Handler) RegisterRoutes(serv *http.ServeMux) {
-	serv.HandleFunc("POST /tasks", h.taskPOST)
-	serv.HandleFunc("GET /tasks", h.taskLIST)
-	serv.HandleFunc("GET /tasks/{id}", h.taskGET)
-	serv.HandleFunc("PUT /tasks/{id}", h.taskPUT)
-	serv.HandleFunc("DELETE /tasks/{id}", h.taskDELETE)
+	serv.HandleFunc("POST /tasks", h.handlePOST)
+	serv.HandleFunc("GET /tasks", h.handleLIST)
+	serv.HandleFunc("GET /tasks/{id}", h.handleGET)
+	serv.HandleFunc("PUT /tasks/{id}", h.handlePUT)
+	serv.HandleFunc("DELETE /tasks/{id}", h.handleDELETE)
+	serv.HandleFunc("PUT /tasks/{id}/update", h.handleSTATUS)
 }
 
 func validateID(r *http.Request) (string, error) {
@@ -36,7 +37,7 @@ func validateID(r *http.Request) (string, error) {
 	return id, nil
 }
 
-func (h *Handler) taskPOST(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handlePOST(w http.ResponseWriter, r *http.Request) {
 
 	var task types.TaskPayLoad
 	err := utils.ValidateFields(w, r, &task)
@@ -59,7 +60,7 @@ func (h *Handler) taskPOST(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusCreated, task)
 }
 
-func (h *Handler) taskLIST(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleLIST(w http.ResponseWriter, r *http.Request) {
 
 	tasks, err := h.store.ListTasks()
 	if err != nil {
@@ -70,7 +71,7 @@ func (h *Handler) taskLIST(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusOK, tasks)
 }
 
-func (h *Handler) taskGET(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleGET(w http.ResponseWriter, r *http.Request) {
 
 	id, err := validateID(r)
 	if err != nil {
@@ -87,7 +88,7 @@ func (h *Handler) taskGET(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusOK, task)
 }
 
-func (h *Handler) taskPUT(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handlePUT(w http.ResponseWriter, r *http.Request) {
 
 	id, err := validateID(r)
 	if err != nil {
@@ -129,7 +130,7 @@ func (h *Handler) taskPUT(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusOK, task)
 }
 
-func (h *Handler) taskDELETE(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleDELETE(w http.ResponseWriter, r *http.Request) {
 
 	id, err := validateID(r)
 	if err != nil {
@@ -140,6 +141,40 @@ func (h *Handler) taskDELETE(w http.ResponseWriter, r *http.Request) {
 	task, err := h.store.DeleteTask(id)
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("not found id"))
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, task)
+}
+
+func (h *Handler) handleSTATUS(w http.ResponseWriter, r *http.Request) {
+
+	id, err := validateID(r)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+	task, err := h.store.GetTaskByID(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("not found id"))
+		return
+	}
+
+	statuses := []string{"ToDo", "Doing", "Done"}
+	var nextStatus string
+
+	for i, status := range statuses {
+		if task.Status == status {
+			nextStatus = statuses[(i+1)%len(statuses)]
+			break
+		}
+	}
+
+	task.Status = nextStatus
+
+	err = h.store.UpdateTask(*task)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
