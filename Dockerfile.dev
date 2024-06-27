@@ -1,6 +1,6 @@
 # Usar uma imagem base do Go para desenvolvimento
 FROM golang:1.22-alpine
-WORKDIR /internship-project 
+WORKDIR /internship-project
 # Copiar os arquivos de configuração do Go e baixar as dependências
 COPY go.mod go.sum ./
 RUN go mod download
@@ -8,7 +8,6 @@ RUN go mod download
 COPY . .
 # Run the tests in the container
 
-RUN go build -o serv-API ./cmd/
 EXPOSE 8080
-# Iniciar o servidor em de producao
-CMD ["./serv-API"]
+# Iniciar o servidor de desenvolvimento
+CMD ["go", "run", "./cmd"]
