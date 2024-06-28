@@ -1,16 +1,13 @@
-# Usar uma imagem base do Go para desenvolvimento
+# Start the production server
+## Use a Go base image
 FROM golang:1.22-alpine
-# Instalar as dependências necessárias para cgo
-RUN apk add --no-cache gcc musl-dev
-WORKDIR /taskstodo
-
+WORKDIR /taskstodo 
+## Copy and install npm files and dependencies
 COPY go.mod go.sum ./
 RUN go mod download
-# Copiar todos os arquivos do projeto
+RUN apk add --no-cache gcc musl-dev
+# Copy files , enable cgo and expose
 COPY . .
-# Variável de ambiente para habilitar cgo
 ENV CGO_ENABLED=1
-
 EXPOSE 8080
-# Iniciar o servidor de desenvolvimento
 CMD ["go", "run", "./cmd"]

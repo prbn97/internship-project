@@ -1,16 +1,15 @@
-# Usar uma imagem base do Node.js para desenvolvimento
-# Definir diretorio
+# Start the production phase
+## Use a Node.js base image
 FROM node:22-alpine AS builder 
 WORKDIR /app
-# Copiar e instalar arquivos do npm e dependências
+## Copy and install npm files and dependencies
 COPY package*.json ./
 RUN npm install
-# Copiar todos os arquivos do projeto
+## Copy all files build
 COPY . .
-# Run the tests in the container
 RUN npm run build
+# Start the production server
 FROM nginx:alpine
 COPY --from=builder /app/build /usr/share/nginx/html
-# Expor a porta usada pelo servidor de producao
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
