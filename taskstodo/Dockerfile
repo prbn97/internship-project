@@ -1,6 +1,6 @@
 # Usar uma imagem base do Go para desenvolvimento
 FROM golang:1.22-alpine
-WORKDIR /internship-project 
+WORKDIR /taskstodo 
 # Copiar os arquivos de configuração do Go e baixar as dependências
 COPY go.mod go.sum ./
 RUN go mod download
