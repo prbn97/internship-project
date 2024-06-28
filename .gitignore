@@ -1,2 +1,53 @@
 serv-API
 tasksStore.json
+
+# Node modules
+node_modules/
+front-taskstodo/node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+front-taskstodo/logs/
+
+# Build directory
+build/
+front-taskstodo/build/
+
+# Dependency directories
+node_modules/
+jspm_packages/
+front-taskstodo/jspm_packages/
+
+# Production
+/dist
+front-taskstodo/dist/
+
+# Optional npm cache directory
+.npm
+front-taskstodo/.npm
+
+# Mac OS
+.DS_Store
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+front-taskstodo/.vscode/
+front-taskstodo/.idea/
+
+# Operating system files
+Thumbs.db
+Desktop.ini
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+front-taskstodo/.env
+front-taskstodo/.env.local
+front-taskstodo/.env.*.local
+.DS_Store
