@@ -1,0 +1,23 @@
+services:
+
+  frontend:
+    build:
+      context: ./front-taskstodo
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./front-taskstodo:/app
+      - /app/node_modules
+
+  backend:
+    build:
+      context: ./taskstodo
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./taskstodo:/taskstodo
+      - /taskstodo/go/pkg
+    environment:
+      - DB_PATH=/internship-project/db/tasksStore.json

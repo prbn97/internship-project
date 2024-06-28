@@ -1,0 +1,20 @@
+services:
+
+  frontend:
+    build:
+      context: ./front-taskstodo
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+
+  backend:
+    build:
+      context: ./taskstodo
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./taskstodo/db:/taskstodo/db
+    environment:
+      - DB_PATH=/taskstodo/db/tasksStore.json
