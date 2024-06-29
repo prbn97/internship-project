@@ -1,5 +1,8 @@
 package types
 
+// Users
+
+// Tasks
 type TaskPayLoad struct {
 	Title       string `json:"title" validate:"required"`
 	Description string `json:"description"`

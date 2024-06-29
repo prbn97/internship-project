@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
 
 	"github.com/prbn97/internship-project/services/tasks"
@@ -9,27 +10,30 @@ import (
 )
 
 type APIserver struct {
-	addr string
-	db   *sql.DB
+	addres   string
+	database *sql.DB
 }
 
-func NewAPIserver(addr string, database *sql.DB) *APIserver {
+func NewAPIserver(addr string, db *sql.DB) *APIserver {
 	return &APIserver{
-		addr: addr,
-		db:   database,
+		addres:   addr,
+		database: db,
 	}
 }
 
 func (serv *APIserver) Run() error {
-	// initialeze a router
+	// initialeze a router and subrouter
 	router := http.NewServeMux()
+	subrouter := http.NewServeMux()
+	subrouter.Handle("/api/v1/", http.StripPrefix("/api/v1/", router))
 
-	// registre handlers
-	users := users.NewHandler()
-	users.RegisterRoutes(router)
-	tasks := tasks.NewHandler()
-	tasks.RegisterRoutes(router)
+	// registre all routes
+	usersService := users.NewHandler()
+	usersService.RegisterRoutes(subrouter)
 
-	// registres all dependencies
-	return nil
+	tasksService := tasks.NewHandler()
+	tasksService.RegisterRoutes(subrouter)
+	// Listen and Serve router
+	log.Println("Listening on", serv.addres)
+	return http.ListenAndServe(serv.addres, router)
 }
