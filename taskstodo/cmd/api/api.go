@@ -21,18 +21,23 @@ func NewAPIserver(addr string, db *sql.DB) *APIserver {
 	}
 }
 
+// the api holds the handlers and the stores
+// manege the api services from here
 func (serv *APIserver) Run() error {
-	// initialeze a router and subrouter
 	router := http.NewServeMux()
-	subrouter := http.NewServeMux()
-	subrouter.Handle("/api/v1/", http.StripPrefix("/api/v1/", router))
 
-	// registre all routes
-	usersService := users.NewHandler()
-	usersService.RegisterRoutes(subrouter)
+	// learn about subrouter and how to use.
+	// subrouter := http.NewServeMux()
+	// subrouter.Handle("/api/v1/", http.StripPrefix("/api/v1/", router))
 
-	tasksService := tasks.NewHandler()
-	tasksService.RegisterRoutes(subrouter)
+	userStore := users.NewStore(serv.database)
+	usersRoutes := users.NewHandler(userStore)
+	usersRoutes.RegisterRoutes(router)
+
+	tasksStore := tasks.NewStore(serv.database)
+	tasksRoutes := tasks.NewHandler(tasksStore)
+	tasksRoutes.RegisterRoutes(router)
+
 	// Listen and Serve router
 	log.Println("Listening on", serv.addres)
 	return http.ListenAndServe(serv.addres, router)

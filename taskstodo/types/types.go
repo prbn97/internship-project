@@ -2,6 +2,8 @@ package types
 
 import "time"
 
+// using validate:"required"` to use "github.com/go-playground/validator/v10"
+
 // Users Payloads
 type RegisterUserPayload struct {
 	FirstName string `json:"firstName" validate:"required"`

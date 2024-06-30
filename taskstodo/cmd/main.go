@@ -6,23 +6,25 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/prbn97/internship-project/cmd/api"
-	"github.com/prbn97/internship-project/config"
+	"github.com/prbn97/internship-project/configs"
 	"github.com/prbn97/internship-project/db"
 )
 
 // the entry point for the API
 func main() {
-	// create the database
-	db, err := db.NewMySQLstorage(mysql.Config{
-		User:                 config.Envs.DBuser,
-		Passwd:               config.Envs.DBpassWord,
-		Addr:                 config.Envs.DBaddress,
-		DBName:               config.Envs.DBname,
+
+	// get configs
+	cfg := mysql.Config{
+		User:                 configs.Envs.DBuser,
+		Passwd:               configs.Envs.DBpassWord,
+		Addr:                 configs.Envs.DBaddress,
+		DBName:               configs.Envs.DBname,
 		Net:                  "tcp",
 		AllowNativePasswords: true,
 		ParseTime:            true,
-	})
-
+	}
+	// create the database
+	db, err := db.NewMySQLstorage(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
