@@ -1,20 +1,20 @@
-package types
+package models
 
 import "time"
 
 // using validate:"required"` to use "github.com/go-playground/validator/v10"
 
 // Users Payloads
+type LoginUserPayload struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
 type RegisterUserPayload struct {
 	FirstName string `json:"firstName" validate:"required"`
 	LastName  string `json:"lastName" validate:"required"`
 	Email     string `json:"email" validate:"required,email"`
 	Password  string `json:"password" validate:"required,min=3,max=130"`
-}
-
-type LoginUserPayload struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
 }
 
 // Users Object
@@ -52,9 +52,9 @@ type Task struct {
 
 // Tasks Interface
 type TaskStore interface {
-	CreateTask(TaskPayLoad) error
-	ListTasks() ([]*Task, error)
-	GetTaskByID(id string) (*Task, error)
+	CreateTask(payload TaskPayLoad, userID int) error
+	ListTasks(userID int) ([]*Task, error)
+	GetTaskByID(userID int, id int) (*Task, error)
 	UpdateTask(Task) error
-	DeleteTask(id string) (Task, error)
+	DeleteTask(userID int, id int) error
 }

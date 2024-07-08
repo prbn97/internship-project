@@ -35,7 +35,7 @@ func (serv *APIserver) Run() error {
 	usersRoutes.RegisterRoutes(router)
 
 	tasksStore := tasks.NewStore(serv.database)
-	tasksRoutes := tasks.NewHandler(tasksStore)
+	tasksRoutes := tasks.NewHandler(userStore, tasksStore)
 	tasksRoutes.RegisterRoutes(router)
 
 	// Listen and Serve router

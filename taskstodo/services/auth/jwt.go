@@ -10,8 +10,8 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/prbn97/internship-project/configs"
-	"github.com/prbn97/internship-project/types"
-	"github.com/prbn97/internship-project/utils"
+	types "github.com/prbn97/internship-project/services/models"
+	"github.com/prbn97/internship-project/services/utils"
 )
 
 type contextKey string
@@ -34,6 +34,7 @@ func CreateJWT(secret []byte, userID int) (string, error) {
 	return tokenString, err
 }
 
+// WithJWTAuth Call the function if the token is valid
 func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenString := utils.GetTokenFromRequest(r)

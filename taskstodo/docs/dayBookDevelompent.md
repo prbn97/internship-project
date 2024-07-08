@@ -435,3 +435,17 @@ Usar OpenAPI e criar a documentação
 # June day 05 - *Milestone 5: Documentation*
 
 Now focus on documentation, using OpenAPI and mermaid to make a good documentation
+
+# July day 08 - *Update*
+
+One month since the last report.
+I have been working on the project, however I have not updated this diary.
+
+Since then many changes was made. Now we have a mysql database and users service for the api.
+The frontend with react need to be update, because the jwt token was mocked for the front.
+
+Change to use next.js will be a good way to learn more react and typescript. (save this for later)
+
+I learned docker, and now undestand more the concepts of CI/CD.
+
+But first make a deploy with tsuru is the goal now.

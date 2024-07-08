@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/prbn97/internship-project/types"
+	types "github.com/prbn97/internship-project/services/models"
 )
 
 type Store struct {

@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS tasks (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `userID` INT UNSIGNED NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `description` VARCHAR(510) NOT NULL,
+  `status` ENUM('ToDo', 'Doing', 'Done') NOT NULL DEFAULT 'ToDo',
+  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`userId`) REFERENCES users(`id`)
+);
