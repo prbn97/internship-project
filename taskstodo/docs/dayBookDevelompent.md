@@ -389,6 +389,7 @@ type Store struct {
 
 ### in folder /types/
 > you will find the structures and interfaces that services use.
+
 ```go
 package types
 
@@ -425,20 +426,13 @@ func WriteError(w http.ResponseWriter, status int, err error) {}
 func ParseJSON(r *http.Request, v any) error {}
 ```
 
-o que falta? 
-usar o recurso de path parameters da nova versão go 1.22 (removendo as varriaveis de expressions)
-
-
-
-Usar OpenAPI e criar a documentação
-
 # June day 05 - *Milestone 5: Documentation*
 
 Now focus on documentation, using OpenAPI and mermaid to make a good documentation
 
-# July day 08 - *Update*
+# July day 08 - *One month since the last report.*
+## *One month update*
 
-One month since the last report.
 I have been working on the project, however I have not updated this diary.
 
 Since then many changes was made. Now we have a mysql database and users service for the api.
@@ -449,3 +443,62 @@ Change to use next.js will be a good way to learn more react and typescript. (sa
 I learned docker, and now undestand more the concepts of CI/CD.
 
 But first make a deploy with tsuru is the goal now.
+## *The code since then*
+
+updates
++ Users with Jwt tokens
++ Mysql Database for users and tasks
++ docker-compose.yaml tu build a environments
+
+
+My backend is okay now, there is a need for more tests, but for now it is enough, i can focus in make a dev and prod environments for start using tsuru.
+
+updates to DO:
+- make more tests for the back
+- refactor the front for the new features (users service)
+
+### *The structure:*
+    + /intership-project/
+    
+        + /front-taskstodo/
+            + /node_modules/
+            + /public/
+            + /src/
+                - /components/
+                - /App.go
+                - /index.go
+            - Dockerfile
+            - Dockerfile.dev
+            - package-lock.json
+            - package.json
+            - README.md
+
+        + /taskstodo/
+            + /cmd/
+                - /main.go
+                - /api/
+                - /migrate/
+            + /configs/
+                - /env.go
+            + /db/
+                - /db.go
+            + /docs/
+                - /dayBookDevelopment.md
+                - /openapi.yaml
+            + /services/
+                - /auth/
+                - /models/
+                - /tasks/
+                - /users/
+                - /utils/
+            - .env
+            - Dockerfile
+            - Dockerfile.dev
+            - go.mod
+            - go.sum
+            - Makefile
+            - README.md
+
+        - .gitignore
+        - docker-compose.dev.yaml
+        - docker-compose.yaml

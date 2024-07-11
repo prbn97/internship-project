@@ -1,11 +1,15 @@
 services:
-
-  frontend:
-    build:
-      context: ./front-taskstodo
-      dockerfile: Dockerfile
+  db:
+    image: mysql:8.0
+    healthcheck:
+      test: "exit 0"
+    volumes:
+      - db_data:/var/lib/mysql
     ports:
-      - "80:80"
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mypassword
+      MYSQL_DATABASE: internship_project
 
   backend:
     build:
@@ -17,15 +21,18 @@ services:
     volumes:
       - ./taskstodo/db:/taskstodo/db
     environment:
-      - DB_PATH=/taskstodo/db/tasksStore.json
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: mypassword
+      DB_NAME: internship_project
 
-  tests-backend:
+  frontend:
     build:
-      context: ./taskstodo
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./taskstodo:/taskstodo
-      - /taskstodo/go/pkg
-    environment:
-      - DB_PATH=/internship-project/db/tasksStore.json
-    command: go test ./... -race -cover
+      context: ./front-taskstodo
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+
+volumes:
+  db_data:
