@@ -1,6 +1,6 @@
 # Start the production server
 ## Use a Go base image
-FROM golang:1.22-alpine
+FROM docker-hub.artifactory.globoi.com/golang:1.22-alpine
 WORKDIR /taskstodo 
 ## Copy and install npm files and dependencies
 COPY go.mod go.sum ./

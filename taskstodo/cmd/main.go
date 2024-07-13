@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/prbn97/internship-project/services/task"
@@ -22,8 +22,6 @@ func enableCORS(next http.Handler) http.Handler {
 	})
 }
 
-const port = 8080
-
 func main() {
 	// build storage
 	dbPath := filepath.Join("db", "tasksStore.json")
@@ -41,11 +39,11 @@ func main() {
 	corsHandler := enableCORS(handler)
 
 	// servs info
-	log.Printf("API running at http://localhost:%d/", port)
+	log.Printf("API running at http://localhost:%s/", os.Getenv("PORT"))
 	log.Print("Listening...")
 
 	// start the server
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), corsHandler); err != nil {
+	if err := http.ListenAndServe(":"+os.Getenv("PORT"), corsHandler); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
