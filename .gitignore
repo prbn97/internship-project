@@ -44,10 +44,6 @@ Thumbs.db
 Desktop.ini
 
 # Local environment files
-.env
-.env.local
-.env.*.local
 front-taskstodo/.env
-front-taskstodo/.env.local
-front-taskstodo/.env.*.local
+front-taskstodo/.env
 .DS_Store

@@ -10,35 +10,35 @@ import (
 )
 
 type APIserver struct {
-	addres   string
+	address  string
 	database *sql.DB
 }
 
-func NewAPIserver(addr string, db *sql.DB) *APIserver {
+func NewAPIserver(port string, db *sql.DB) *APIserver {
 	return &APIserver{
-		addres:   addr,
+		address:  port,
 		database: db,
 	}
 }
 
-// the api holds the handlers and the stores
-// manege the api services from here
-func (serv *APIserver) Run() error {
+// the api holds the handlers and the storages
+func (serve *APIserver) Run() error {
 	router := http.NewServeMux()
 
-	// learn about subrouter and how to use.
+	// learn how implement subrouter.
 	// subrouter := http.NewServeMux()
 	// subrouter.Handle("/api/v1/", http.StripPrefix("/api/v1/", router))
 
-	userStore := users.NewStore(serv.database)
+	// users service
+	userStore := users.NewStore(serve.database)
 	usersRoutes := users.NewHandler(userStore)
 	usersRoutes.RegisterRoutes(router)
 
-	tasksStore := tasks.NewStore(serv.database)
+	// tasks service
+	tasksStore := tasks.NewStore(serve.database)
 	tasksRoutes := tasks.NewHandler(userStore, tasksStore)
 	tasksRoutes.RegisterRoutes(router)
 
-	// Listen and Serve router
-	log.Println("Listening on", serv.addres)
-	return http.ListenAndServe(serv.addres, router)
+	log.Println("Listening on", serve.address)
+	return http.ListenAndServe(serve.address, router)
 }

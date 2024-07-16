@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/prbn97/internship-project/cmd/api"
@@ -19,7 +20,7 @@ func main() {
 		Passwd:               configs.Envs.DBpassWord,
 		Addr:                 configs.Envs.DBaddress,
 		DBName:               configs.Envs.DBname,
-		Net:                  "tcp",
+		Net:                  configs.Envs.Net,
 		AllowNativePasswords: true,
 		ParseTime:            true,
 	}
@@ -33,14 +34,14 @@ func main() {
 	initStorage(db)
 
 	// create a API serve instance
-	server := api.NewAPIserver(":8080", db)
+	server := api.NewAPIserver(":"+os.Getenv("PORT"), db)
 	if err := server.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
 
+// establishing a connection to the database.
 func initStorage(db *sql.DB) {
-	// establishing a connection to the database.
 	err := db.Ping()
 	if err != nil {
 		log.Fatal(err)
