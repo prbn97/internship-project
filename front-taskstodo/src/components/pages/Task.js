@@ -27,7 +27,7 @@ const Task = () => {
                 headers: headers,
             };
 
-            fetch(`http://localhost:8080/tasks/${id}`, requestOptions)
+            fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks/${id}`, requestOptions)
                 .then((response) => response.json())
                 .then((data) => {
                     setTask(data);
@@ -84,7 +84,7 @@ const Task = () => {
             }),
         };
 
-        fetch(`http://localhost:8080/tasks/${id}`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks/${id}`, requestOptions)
             .then((response) => response.json())
             .then((data) => {
                 setTask(data);
@@ -120,7 +120,7 @@ const Task = () => {
             headers: headers,
         };
 
-        fetch(`http://localhost:8080/tasks/${id}/update`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks/${id}/update`, requestOptions)
             .then((response) => response.json())
             .then((data) => {
                 setTask(data);
@@ -139,7 +139,7 @@ const Task = () => {
             headers: headers,
         };
 
-        fetch(`http://localhost:8080/tasks/${id}`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks/${id}`, requestOptions)
             .then((response) => {
                 if (response.ok) {
                     navigate('/tasks');

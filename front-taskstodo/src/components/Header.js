@@ -47,7 +47,7 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
             }),
         };
 
-        fetch(`http://localhost:8080/tasks`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks`, requestOptions)
             .then((response) => {
                 if (response.ok) {
                     navigate('/tasks');

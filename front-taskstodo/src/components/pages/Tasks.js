@@ -3,6 +3,8 @@ import logo from '../img/logo.svg';
 import Title from '../Title';
 import { Link, useOutletContext } from "react-router-dom";
 
+
+
 const Tasks = () => {
     const [tasks, setTasks] = useState([]);
     const { user } = useOutletContext(); // get user context 
@@ -17,7 +19,7 @@ const Tasks = () => {
                 headers: headers,
             };
 
-            fetch(`http://localhost:8080/tasks`, requestOptions)
+            fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks`, requestOptions)
                 .then((response) => response.json())
                 .then((data) => {
                     setTasks(data);
