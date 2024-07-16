@@ -21,14 +21,3 @@ services:
       - /taskstodo/go/pkg
     environment:
       - DB_PATH=/internship-project/db/tasksStore.json
-
-  tests-backend:
-    build:
-      context: ./taskstodo
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./taskstodo:/taskstodo
-      - /taskstodo/go/pkg
-    environment:
-      - DB_PATH=/internship-project/db/tasksStore.json
-    command: go test ./... -race -cover

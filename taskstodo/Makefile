@@ -1,4 +1,4 @@
-BINARY_NAME=serv-API
+BINARY_NAME=serv_api
 
 .PHONY: run
 run: build

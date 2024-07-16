@@ -51,3 +51,4 @@ front-taskstodo/.env
 front-taskstodo/.env.local
 front-taskstodo/.env.*.local
 .DS_Store
+taskstodo/serv_api
