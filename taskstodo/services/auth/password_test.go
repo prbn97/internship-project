@@ -32,3 +32,21 @@ func TestComparePasswords(t *testing.T) {
 		t.Errorf("expected password to not match hash")
 	}
 }
+
+func TestComparePasswords_IncorrectPassword(t *testing.T) {
+	hash, err := HashPassword("password")
+	if err != nil {
+		t.Fatalf("error hashing password: %v", err)
+	}
+
+	if ComparePasswords(hash, []byte("wrongpassword")) {
+		t.Errorf("expected password to not match hash")
+	}
+}
+
+func TestHashPassword_Error(t *testing.T) {
+	_, err := HashPassword("")
+	if err == nil {
+		t.Error("expected error for empty password")
+	}
+}

@@ -1,6 +1,6 @@
 # Task API
 
-This project provides a simple API for managing tasks. It allows creating, updating, listing, completing, and deleting tasks.
+This project provides a API Rest for managing tasks. It allows creating, updating, listing, completing, and deleting tasks.
 
 ## Table of Contents
 
@@ -12,8 +12,11 @@ This project provides a simple API for managing tasks. It allows creating, updat
     - [Run the API](#run-the-api)
     - [Run Tests](#run-tests)
   - [API Endpoints](#api-endpoints)
+  - [API Files Structure](#api-files-structure)
+  
   - [Project Structure](#project-structure)
   - [API Flow Diagram](#api-flow-diagram)
+  - [API Class Diagram](#api-class-diagram)
   - [Documentation](#documentation)
   - [License](#license)
 
@@ -21,6 +24,7 @@ This project provides a simple API for managing tasks. It allows creating, updat
 
 - [Go](https://golang.org/doc/install) (version 1.22 or later)
 - [Node.js](https://nodejs.org/en/download/) (for generating documentation using Redocly)
+- [mySQL](https://dev.mysql.com/downloads/workbench/) (Create a database with the name "internship_project")
 
 ## Installation
 
@@ -34,74 +38,175 @@ cd internship-project
 
 ### Run the API
 Use the Makefile to build and run the API:
-
 ```sh
 make run
 ```
 ### Run Tests
-To run the tests for the project:
-
 ```sh
 make test
 ```
 
-## API Endpoints
-- POST /tasks - Create a new task
-- GET /tasks - List all tasks
-- GET /tasks/{id} - Get a task by ID
-- PUT /tasks/{id} - Update a task
-- DELETE /tasks/{id} - Delete a task
-- PUT /tasks/{id}/complete - Mark a task as complete
-- PUT /tasks/{id}/incomplete - Mark a task as incomplete
-
-
-Project Structure
-
+## API Files Structure
 ```plaintext
-/task-api/
+/taskstodo/
     + /cmd/
+        - /api/
         - main.go
+        - main.go
+    + /configs/
+        - env.go
     + /db/
-        - tasksLists.json
+        - db.go
     + /docs/
-        - guideLine.md
         - dayBookDevelopment.md
-        - documentation.md
+        - taskstodo-docs.html
         - openapi.yaml
-        - api-documentation.html
+
     + /services/
+        + /auth/
+            - jwt.go
+            - password.go
+        + /models/
+            - types.go
         + /task/
             - routes.go
             - store.go
-    + /types/
-        - types.go
-    + /utils/
-        - utils.go
-    - README.md
+        + /users/
+            - routes.go
+            - store.go
+        + /utils/
+            - routes.go
+
+
+    - .env.example
+    - Dockerfile
+    - Dockerfile.dev
     - go.mod
+    - go.sum
     - Makefile
+    - README.md
 ```
 
+## API Endpoints
+- POST /register - Create a new user.
+- POST /login - Sing-in in with user email and password
+___
+- POST /tasks - Create a new task.
+- GET /tasks - List all tasks.
+- GET /tasks/{id} - Get a task by ID.
+- PUT /tasks/{id} - Update a task.
+- DELETE /tasks/{id} - Delete a task
+- PUT /tasks/{id}/complete - Mark a task as complete.
+- PUT /tasks/{id}/incomplete - Mark a task as incomplete.
+___
+
 ## API Flow Diagram
-Below is the API flow for creating and managing tasks.
-
 ```mermaid
-graph TD
-    A[Client] -->|POST /tasks| B[Create Task]
-    B -->|Task Created| C[Task Storage]
-    A -->|GET /tasks| D[List Tasks]
-    D --> C
-    A -->|GET /tasks/id| E[Get Task]
-    E --> C
-    A -->|PUT /tasks/id| F[Update Task]
-    F --> C
-    A -->|DELETE /tasks/id| G[Delete Task]
-    G --> C
-    A -->|PUT /tasks/id/complete| H[Complete Task]
-    H --> C
-    A -->|PUT /tasks/id/incomplete| I[Incomplete Task]
-    I --> C
+graph LR
+    A[Client] -->|POST /register| B[User]
+    A[Client] -->|POST /login| B[User]
 
+    B -->|POST /tasks| C[Cretate Task]
+    B -->|GET /tasks| D[List Tasks]
+    B -->|GET /tasks/id| E[Get Task by ID]
+    B -->|PUT /tasks/id| F[Update Task]
+    B -->|DELETE /tasks/id| G[Delete Task]
+    B -->|PUT /tasks/id/update| H[Complete Task]
+
+```
+
+## API Class Diagram
+```mermaid
+classDiagram
+    note for User "can create a task\ncan edit a task\ncan delete a task"
+    
+    usersHandler --  User
+    usersHandler --  UserStore-interface 
+    usersHandler -- RegisterUserPayload
+    usersHandler -- LoginUserPayload
+    Task -- usersHandler
+
+
+    tasksHandler -- Task
+    tasksHandler -- TaskStore-interface
+    tasksHandler -- TaskPayLoad
+
+
+    
+    class User{
+	    - ID        int       `json:"id"`
+	    - FirstName string    `json:"firstName"`
+	    - LastName  string    `json:"lastName"`
+	    - Email     string    `json:"email"`
+	    - Password  string    `json:"-"`
+	    - CreatedAt time.Time `json:"createdAt"`
+    }
+    class RegisterUserPayload {
+    	- FirstName string `json:"firstName" validate:"required"`
+	    - LastName  string `json:"lastName" validate:"required"`
+	    - Email     string `json:"email" validate:"required,email"`
+	    - Password  string `json:"password" validate:"required,min=3,max=130"`
+
+    }
+    class LoginUserPayload {
+        - Email    string `json:"email" validate:"required,email"`
+	    - Password string `json:"password" validate:"required"`
+    }
+
+    class UserStore-interface {
+        - db sql.DB
+        GetUserByEmail(email string) (*User, error)
+	    GetUserByID(id int) (*User, error)
+	    CreateUser(User) error
+    }
+
+    class Task{
+	    - ID          int       `json:"id"`
+	    - UserID      int       `json:"userID"`
+	    - Title       string    `json:"title"`
+	    - Description string    `json:"description"`
+	    - Status      string    `json:"status"`
+	    - CreatedAt   time.Time `json:"createdAt"`
+    }
+    
+    class TaskPayLoad  {
+	    - Title       string `json:"title" validate:"required"`
+	    - Description string `json:"description"`
+    }
+
+    class TaskStore-interface {
+        - db sql.DB
+        
+        CreateTask(TaskPayLoad, userID) error
+	    ListTasks (userID) ([]*Task, error)
+	    GetTaskByID (userID, id) (*Task, error)
+	    UpdateTask (Task) error
+	    DeleteTask (userID , id) error
+    }
+
+    class usersHandler{
+        - userStore UserStore-interface
+
+        RegisterRoutes (*http.ServeMux)
+        handleLogin (http.ResponseWriter, *http.Request)
+        handleRegister (http.ResponseWriter, *http.Request)
+    }
+    class tasksHandler{
+        - userStore UserStore-interface
+	    - taskStore TaskStore-interface
+
+        RegisterRoutes (*http.ServeMux)
+        handleCreateTask (http.ResponseWriter, *http.Request)
+        handleListTasks (http.ResponseWriter, *http.Request)
+        handleGetTask (http.ResponseWriter, *http.Request)
+        handleUpdateTask (http.ResponseWriter, *http.Request)
+        handlDeleteTask (http.ResponseWriter, *http.Request)
+        handleUpdateStatus (http.ResponseWriter, *http.Request)
+
+
+
+
+    }
 ```
 
 ## Documentation

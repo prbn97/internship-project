@@ -18,6 +18,7 @@ type contextKey string
 
 const UserKey contextKey = "userID"
 
+// CreateJWT creates a JWT with the given userID and returns the token as a string.
 func CreateJWT(secret []byte, userID int) (string, error) {
 	expiration := time.Second * time.Duration(configs.Envs.JWTExpirationInSeconds)
 
@@ -31,10 +32,10 @@ func CreateJWT(secret []byte, userID int) (string, error) {
 		return "", err
 	}
 
-	return tokenString, err
+	return tokenString, nil
 }
 
-// WithJWTAuth Call the function if the token is valid
+// WithJWTAuth is an HTTP middleware that validates JWT tokens and adds the userID to the request context.
 func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenString := utils.GetTokenFromRequest(r)
@@ -68,12 +69,12 @@ func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.Handl
 			return
 		}
 
-		// Add the user to the context
+		// Adds the user to the request context
 		ctx := r.Context()
 		ctx = context.WithValue(ctx, UserKey, u.ID)
 		r = r.WithContext(ctx)
 
-		// Call the function if the token is valid
+		// Adds the user to the request context
 		handlerFunc(w, r)
 	}
 }
