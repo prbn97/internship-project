@@ -9,8 +9,7 @@ RUN go mod download
 ## Copy all files build
 COPY . .
 
-## build
-
+## build for tsuru
 ENV GOOS=linux GOARCH=amd64 
 RUN go build -o serv_api ./cmd/
 EXPOSE 8080

@@ -1,13 +1,11 @@
 # Start the production server
 ## Use a Go base image
-FROM golang:1.22-alpine
+FROM docker-hub.artifactory.globoi.com/golang:1.22-alpine
 WORKDIR /taskstodo 
 ## Copy and install npm files and dependencies
 COPY go.mod go.sum ./
 RUN go mod download
-RUN apk add --no-cache gcc musl-dev
 # Copy files , enable cgo and expose
 COPY . .
-ENV CGO_ENABLED=1
 EXPOSE 8080
 CMD ["go", "run", "./cmd"]
