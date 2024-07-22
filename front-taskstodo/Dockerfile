@@ -1,4 +1,3 @@
-# Start the production phase
 ## Use a Node.js base image
 FROM node:22-alpine AS builder 
 WORKDIR /app

@@ -1,4 +1,3 @@
-
 ## Use a Go base image
 FROM docker-hub.artifactory.globoi.com/golang:1.22-alpine
 WORKDIR /taskstodo 

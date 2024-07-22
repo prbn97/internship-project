@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+
 	loadEnvFiles()
 
 	// build storage
@@ -56,7 +57,7 @@ func loadEnvFiles() {
 	if err := godotenv.Load(".env"); err != nil {
 		log.Println(".env file not found. Trying to load env.example")
 
-		if err := godotenv.Load("env.example"); err != nil {
+		if err := godotenv.Load(".env.example"); err != nil {
 			log.Println("No .env or env.example files found")
 		} else {
 			log.Println("env.example file loaded")

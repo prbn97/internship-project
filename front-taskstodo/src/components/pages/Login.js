@@ -13,7 +13,7 @@ function Login() {
         const fakeUser = { name: "Paulo", email: "paulo@example.com" };
         setJwtToken(fakeJwtToken);
         setUser(fakeUser);
-        navigate("/tasks");
+        navigate("/");
     };
 
     return (
