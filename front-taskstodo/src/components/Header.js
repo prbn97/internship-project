@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Nav, Navbar, Modal, Button, Form } from 'react-bootstrap';
-import logo from './img/logo.svg';
-import create from './img/create.svg';
-import login from './img/login.svg';
+import logo from '../img/logo.svg';
+import create from '../img/create.svg';
+import login from '../img/login.svg';
 import Title from './Title';
 
 function Header({ jwtToken, setJwtToken, user, setUser }) {
@@ -12,6 +12,9 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
     const [description, setDescription] = useState("");
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
+    const handleOpenModal = () => setShowModal(true);
+
+
 
     const handleCloseModal = () => {
         setShowModal(false);
@@ -19,11 +22,15 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
         setDescription("");
         setErrors({});
     };
-    const handleOpenModal = () => setShowModal(true);
 
-    const handleLogout = () => {
-        setJwtToken("");
-        setUser(null);
+    const handleSubmit = () => {
+        const validationErrors = validateForm();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+        } else {
+            handlePOST(title, description)
+            handleCloseModal();
+        }
     };
 
     const validateForm = () => {
@@ -50,7 +57,7 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
         fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks`, requestOptions)
             .then((response) => {
                 if (response.ok) {
-                    navigate('/tasks');
+                    navigate('/');
                 }
             })
             .catch(err => {
@@ -58,14 +65,11 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
             })
     };
 
-    const handleSubmit = () => {
-        const validationErrors = validateForm();
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-        } else {
-            handlePOST(title, description)
-            handleCloseModal();
-        }
+
+
+    const handleLogout = () => {
+        setJwtToken("");
+        setUser(null);
     };
 
     return (

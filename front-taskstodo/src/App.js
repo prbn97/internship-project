@@ -7,16 +7,22 @@ function App() {
   const [user, setUser] = useState(null);
 
   return (
+
     <div className="Container">
-      <div className="row">
+
+      <header className="row">
         <Header jwtToken={jwtToken} setJwtToken={setJwtToken} user={user} setUser={setUser} />
-      </div>
-      <div className="row justify-content-center">
+      </header>
+
+
+      <main className="row justify-content-center">
         <div className="col-6">
           <Outlet context={{ user, setUser, setJwtToken }} />
         </div>
-      </div>
+      </main>
+
     </div>
+
   );
 }
 

@@ -5,15 +5,16 @@ import edit from '../img/edit.svg';
 import close from '../img/close.svg';
 import save from '../img/save.svg';
 import del from '../img/delete.svg';
-import Title from '../Title';
+import Title from '../components/Title';
 
-const Task = () => {
-    const [task, setTask] = useState({});
+const TaskEdition = () => {
+    const { user } = useOutletContext(); // get user context
+    const [task, setTask] = useState({}); // get tasks 
+
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState("");
     const [editedDescription, setEditedDescription] = useState("");
     const [errors, setErrors] = useState({});
-    const { user } = useOutletContext(); // get user context
     let { id } = useParams();
     const navigate = useNavigate();
 
@@ -25,8 +26,7 @@ const Task = () => {
             const requestOptions = {
                 method: "GET",
                 headers: headers,
-            };
-
+            }; // get task by id
             fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks/${id}`, requestOptions)
                 .then((response) => response.json())
                 .then((data) => {
@@ -49,7 +49,7 @@ const Task = () => {
             case "Done":
                 return "btn-success";
             default:
-                return "btn-secondary"; // fallback color
+                return "btn-secondary";
         }
     };
 
@@ -65,6 +65,12 @@ const Task = () => {
         return newErrors;
     };
 
+    const handleCancelClick = () => {
+        setEditedTitle(task.title);
+        setEditedDescription(task.description);
+        setIsEditing(false);
+        setErrors({});
+    };
     const handleSaveClick = () => {
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
@@ -96,21 +102,14 @@ const Task = () => {
             });
     };
 
-    const handleCancelClick = () => {
-        setEditedTitle(task.title);
-        setEditedDescription(task.description);
-        setIsEditing(false);
-        setErrors({});
-    };
+
 
     const handleTitleChange = (event) => {
         setEditedTitle(event.target.value);
     };
-
     const handleDescriptionChange = (event) => {
         setEditedDescription(event.target.value);
     };
-
     const handleStatusClick = () => {
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
@@ -129,7 +128,6 @@ const Task = () => {
                 console.log(err);
             });
     };
-
     const handleDelete = () => {
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
@@ -142,7 +140,7 @@ const Task = () => {
         fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks/${id}`, requestOptions)
             .then((response) => {
                 if (response.ok) {
-                    navigate('/tasks');
+                    navigate('/');
                 }
             })
             .catch(err => {
@@ -162,6 +160,7 @@ const Task = () => {
                         ) : (
                             <>
                                 <div className="d-flex align-items-center mb-3">
+
                                     <Title className="" icon={logo} text={task.title} />
                                     {!isEditing ? (
                                         <img
@@ -250,4 +249,4 @@ const Task = () => {
     );
 };
 
-export default Task;
+export default TaskEdition;

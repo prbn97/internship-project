@@ -2,11 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
-import ErrorPage from './components/pages/ErrorPage';
-import Home from './components/pages/Home';
-import Login from './components/pages/Login';
-import Tasks from './components/pages/Tasks';
-import Task from './components/pages/Task';
+import ErrorPage from './pages/ErrorPage';
+import Login from './pages/Login';
+import Tasks from './pages/Tasks';
+import Task from './pages/Task';
 
 
 const router = createBrowserRouter([
@@ -15,12 +14,9 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <Home /> },
+      { index: true, element: <Tasks /> },
 
-      {
-        path: "/tasks",
-        element: <Tasks />,
-      },
+
       {
         path: "/tasks/:id",
         element: <Task />,

@@ -1,6 +1,6 @@
 const Title = ({ icon, text }) => {
     return (
-        <div className="d-flex align-items mt-2 ">
+        <div className="d-flex">
             <img
                 alt="icon-title"
                 src={icon}
