@@ -1,6 +1,6 @@
 const Title = ({ icon, text }) => {
     return (
-        <div className="d-flex">
+        <div className="d-flex mt-2">
             <img
                 alt="icon-title"
                 src={icon}

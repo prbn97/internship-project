@@ -1,22 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useOutletContext } from "react-router-dom";
-
+import TaskItem from "./TaskItem";
 
 const TaskList = () => {
-	const { user } = useOutletContext(); // get user mock login context 
-	const [tasks, setTasks] = useState([]);
-
+	const { user, tasks, setTasks } = useOutletContext(); // get user context
 
 	useEffect(() => {
-		if (user) { // if the user in logged
-
+		if (user) { // if the user is logged in
 			const headers = new Headers();
 			headers.append("Content-Type", "application/json");
+
 			// get tasks list
 			const requestOptions = {
 				method: "GET",
 				headers: headers,
 			};
+
 			fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks`, requestOptions)
 				.then((response) => response.json())
 				.then((data) => {
@@ -26,10 +25,7 @@ const TaskList = () => {
 					console.log(err);
 				});
 		}
-
-
-	}, [user]);
-
+	}, [user, setTasks]);
 
 	const getStatusBadgeClass = (status) => {
 		switch (status) {
@@ -44,39 +40,22 @@ const TaskList = () => {
 		}
 	};
 
-
 	return (
 		<>
-			<div className="col">
+			<div className="col mt-2">
 				{!user ?
 					(<div className="alert alert-warning" role="alert">
 						Please log in to see your tasks.
 					</div>)
+					: (tasks.map((task) => (<>
+						<TaskItem task={task} />
 
-					: (tasks.map((listItem) => (
-						<Link key={listItem.id} to={`/tasks/${listItem.id}`} className="text-decoration-none">
-							<div className="card mb-3" style={{ transition: 'transform 0.2s', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}
-								onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'}
-								onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
-								<div className="card-body">
-									<h5 className="card-title">{listItem.title}</h5>
-									<p className="card-text">{listItem.description}</p>
-									<span className={`badge ${getStatusBadgeClass(listItem.status)}`}>
-										Status: {listItem.status}
-									</span>
-								</div>
-							</div>
-
-						</Link>
-					))
-
-					)
+					</>
+					)))
 				}
-
 			</div>
 		</>
 	);
 };
 
 export default TaskList;
-

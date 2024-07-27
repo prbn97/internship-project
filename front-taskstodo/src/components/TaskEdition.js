@@ -159,20 +159,29 @@ const TaskEdition = () => {
                             </div>
                         ) : (
                             <>
-                                <div className="d-flex align-items-center mb-3">
+                                <div className="d-flex align-items-center mb-1">
 
                                     <Title className="" icon={logo} text={task.title} />
                                     {!isEditing ? (
                                         <img
-                                            alt="icon-title"
+                                            alt="icon-edit-task"
                                             src={edit}
                                             width="30"
                                             height="30"
-                                            className="ms-2 cursor-pointer"
+                                            className="ms-4 cursor-pointer"
                                             onClick={handleEditClick}
+
                                         />
                                     ) : (
                                         <>
+                                            <img
+                                                alt="icon-close"
+                                                src={close}
+                                                width="30"
+                                                height="30"
+                                                className="ms-4 cursor-pointer"
+                                                onClick={handleCancelClick}
+                                            />
                                             <img
                                                 alt="icon-save"
                                                 src={save}
@@ -181,20 +190,13 @@ const TaskEdition = () => {
                                                 className="ms-2 cursor-pointer"
                                                 onClick={handleSaveClick}
                                             />
-                                            <img
-                                                alt="icon-close"
-                                                src={close}
-                                                width="30"
-                                                height="30"
-                                                className="ms-2 cursor-pointer"
-                                                onClick={handleCancelClick}
-                                            />
+
                                             <img
                                                 alt="icon-close"
                                                 src={del}
                                                 width="30"
                                                 height="30"
-                                                className="ms-2 cursor-pointer"
+                                                className="ms-5 cursor-pointer"
                                                 onClick={handleDelete}
                                             />
                                         </>
@@ -225,8 +227,7 @@ const TaskEdition = () => {
                                             <button
                                                 className={`btn ${getStatusBadgeClass(task.status)} cursor-pointer`}
                                                 onClick={handleStatusClick}
-                                            >
-                                                Status: {task.status}
+                                            > Status: {task.status}
                                             </button>
                                         </div>
                                         {!isEditing ? (

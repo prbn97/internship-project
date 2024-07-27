@@ -6,15 +6,12 @@ import create from '../img/create.svg';
 import login from '../img/login.svg';
 import Title from './Title';
 
-function Header({ jwtToken, setJwtToken, user, setUser }) {
+function Header({ jwtToken, setJwtToken, user, setUser, tasks, setTasks }) {
     const [showModal, setShowModal] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
-    const handleOpenModal = () => setShowModal(true);
-
-
 
     const handleCloseModal = () => {
         setShowModal(false);
@@ -23,12 +20,14 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
         setErrors({});
     };
 
+    const handleOpenModal = () => setShowModal(true);
+
     const handleSubmit = () => {
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
         } else {
-            handlePOST(title, description)
+            handlePOST(title, description);
             handleCloseModal();
         }
     };
@@ -41,7 +40,7 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
         return newErrors;
     };
 
-    const handlePOST = (title, description) => {
+    const handlePOST = async (title, description) => {
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
 
@@ -54,18 +53,19 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
             }),
         };
 
-        fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks`, requestOptions)
-            .then((response) => {
-                if (response.ok) {
-                    navigate('/');
-                }
-            })
-            .catch(err => {
-                console.log(err);
-            })
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks`, requestOptions);
+            if (response.ok) {
+                const newTask = await response.json();
+                setTasks([...tasks, newTask]);
+                navigate('/');
+            } else {
+                throw new Error("Failed to create task");
+            }
+        } catch (err) {
+            console.log(err);
+        }
     };
-
-
 
     const handleLogout = () => {
         setJwtToken("");
@@ -92,23 +92,23 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav" className="d-flex justify-content-end">
                         <Nav className="d-flex align-items-center">
-                            <Nav.Link
-                                onClick={handleOpenModal}
+                            <Nav.Link onClick={handleOpenModal}
                                 className="d-flex align-items-center"
-                                disabled={jwtToken === ""}
-                            >
+                                disabled={jwtToken === ""} >
                                 <img alt="" src={create} width="30" height="30"
                                     className="d-inline-block align-top" />
                                 Create Task
                             </Nav.Link>
-                            {jwtToken === ""
-                                ? <Nav.Link as={Link} to="/login" className="d-flex align-items-center">
+                            {jwtToken === "" ?
+                                <Nav.Link as={Link} to="/login"
+                                    className="d-flex align-items-center">
                                     Login
                                     <img alt="" src={login} width="30" height="30"
                                         className="d-inline-block align-top m-2"
                                     />
                                 </Nav.Link>
-                                : <Nav.Link as={Link} to="/" onClick={handleLogout} className="d-flex align-items-center">
+                                : <Nav.Link as={Link} to="/"
+                                    onClick={handleLogout} className="d-flex align-items-center">
                                     Logout
                                     <img alt="" src={login} width="30" height="30"
                                         className="d-inline-block align-top m-2"
@@ -118,7 +118,7 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
                         </Nav>
                     </Navbar.Collapse>
                 </Container>
-            </Navbar >
+            </Navbar>
 
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
@@ -149,7 +149,6 @@ function Header({ jwtToken, setJwtToken, user, setUser }) {
                                 onChange={(e) => setDescription(e.target.value)}
                             />
                         </Form.Group>
-
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
