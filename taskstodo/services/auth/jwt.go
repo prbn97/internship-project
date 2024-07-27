@@ -23,8 +23,11 @@ func CreateJWT(secret []byte, userID int) (string, error) {
 	expiration := time.Second * time.Duration(configs.Envs.JWTExpirationInSeconds)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID":    strconv.Itoa(int(userID)),
-		"expiresAt": time.Now().Add(expiration).Unix(),
+		"sub": strconv.Itoa(int(userID)), // Subject
+		"iat": time.Now().Unix(),         // Issued At
+		"typ": "JWT",
+		"nbf": time.Now().Unix(),                 // Not Before
+		"exp": time.Now().Add(expiration).Unix(), // Expiration
 	})
 
 	tokenString, err := token.SignedString(secret)
@@ -53,7 +56,7 @@ func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.Handl
 		}
 
 		claims := token.Claims.(jwt.MapClaims)
-		str := claims["userID"].(string)
+		str := claims["sub"].(string)
 
 		userID, err := strconv.Atoi(str)
 		if err != nil {
@@ -74,7 +77,6 @@ func WithJWTAuth(handlerFunc http.HandlerFunc, store types.UserStore) http.Handl
 		ctx = context.WithValue(ctx, UserKey, u.ID)
 		r = r.WithContext(ctx)
 
-		// Adds the user to the request context
 		handlerFunc(w, r)
 	}
 }

@@ -467,6 +467,7 @@ updates to DO:
                 - /components/
                 - /App.go
                 - /index.go
+            - .env.example
             - Dockerfile
             - Dockerfile.dev
             - package-lock.json
@@ -491,7 +492,7 @@ updates to DO:
                 - /tasks/
                 - /users/
                 - /utils/
-            - .env
+            - .env.example
             - Dockerfile
             - Dockerfile.dev
             - go.mod
@@ -502,3 +503,12 @@ updates to DO:
         - .gitignore
         - docker-compose.dev.yaml
         - docker-compose.yaml
+
+
+### *The MileStones:*
+
+make a front end that use all the services of frontend.
+
+toDO:
+> Chck the backend (register, login and task creation)
+> Chck the frontend (forms, register, login and task creation)
