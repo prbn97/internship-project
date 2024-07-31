@@ -1,6 +1,6 @@
-import Home from "./pages/Home";
-import TasksList from "./pages/TasksList";
+
 import Header from "./components/Header";
+import { Outlet } from "react-router-dom";
 
 function App() {
 
@@ -14,9 +14,9 @@ function App() {
 
       {/* Body */}
       < div className="row" >
-        <Home />
-        <TasksList />
 
+        <Outlet />
+        {/*inside  <Outlet/>  we display the components*/}
 
 
       </div >
