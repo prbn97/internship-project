@@ -2,7 +2,7 @@ services:
 
   frontend:
     build:
-      context: ./front-taskstodo
+      context: ./client-taskstodo
       dockerfile: Dockerfile
     ports:
       - "80:80"
