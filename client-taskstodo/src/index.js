@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
 import ErrorPage from './pages/ErrorPage';
-import Home from './pages/Home'
-import TaskList from './pages/TasksList'
-import Login from './pages/Login'
+import Home from './pages/Home';
+import Login from './pages/Login';
+import TaskList from './pages/TasksList';
+import Task from './pages/Task';
 
 
 // this router is passing for the router provider <RouterProvider/>
@@ -19,12 +20,16 @@ const router = createBrowserRouter([
       // will use <App/> by default
       { index: true, element: <Home /> },
       {
+        path: "/login",
+        element: <Login />
+      },
+      {
         path: "/tasks",
         element: <TaskList />
       },
       {
-        path: "/login",
-        element: <Login />
+        path: "/tasks/0",
+        element: <Task />
       },
     ]
   }

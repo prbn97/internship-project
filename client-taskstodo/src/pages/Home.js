@@ -1,9 +1,15 @@
+import LoginReminder from "../components/LoginReminder";
+import TasksList from "./TasksList";
 const Home = () => {
     return (
-        <div>
-            this is my home page
 
-        </div>
+        <>
+            <div className="text-center">
+                <LoginReminder />
+
+            </div>
+            <TasksList />
+        </>
     );
 }
 
