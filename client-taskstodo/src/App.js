@@ -1,22 +1,35 @@
 
-import Header from "./components/Header";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
+import Header from "./components/Header";
+import Alert from "./components/Alert"
+
 function App() {
+  const [jwtToken, setJwtToken] = useState("");
+
+  // state variables to store infos to alert component
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertClassName, setAlertClassName] = useState("d-none"); //d-none bootstrap class to display:none
+
+
 
   return (
     <div className="container">
 
-      {/* Header */}
       <div className="row">
-        <Header />
+        <Header jwtToken={jwtToken} setJwtToken={setJwtToken} />
       </div >
 
-      {/* Body */}
       < div className="row" >
-
-        <Outlet />
-        {/*inside  <Outlet/>  we display the components*/}
+        {/*inside  <Outlet/>  we display the components, with "context" you can pass informatin like jwt token and alert*/}
+        <Alert message={alertMessage} className={alertClassName} />
+        <Outlet context={{
+          jwtToken,
+          setJwtToken,
+          setAlertClassName,
+          setAlertMessage
+        }} />
 
 
       </div >

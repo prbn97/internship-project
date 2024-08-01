@@ -1,14 +1,17 @@
+import { useOutletContext } from "react-router-dom";
+
 import LoginReminder from "../components/LoginReminder";
 import TasksList from "./TasksList";
 const Home = () => {
+
+    const { jwtToken } = useOutletContext();
+
     return (
-
         <>
-            <div className="text-center">
-                <LoginReminder />
-            </div>
-
-            <TasksList />
+            {jwtToken === ""
+                ? < div className="text-center"><LoginReminder /> </div >
+                : <TasksList />
+            }
         </>
     );
 }
