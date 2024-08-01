@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
 import App from './App';
-import ErrorPage from './pages/ErrorPage';
 import Home from './pages/Home';
+import ErrorPage from './pages/ErrorPage';
 import Login from './pages/Login';
 import TaskList from './pages/TasksList';
 import Task from './pages/Task';
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
         element: <TaskList />
       },
       {
-        path: "/tasks/0",
+        path: "/tasks/:id",
         element: <Task />
       },
     ]

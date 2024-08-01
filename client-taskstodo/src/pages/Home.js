@@ -6,8 +6,8 @@ const Home = () => {
         <>
             <div className="text-center">
                 <LoginReminder />
-
             </div>
+
             <TasksList />
         </>
     );

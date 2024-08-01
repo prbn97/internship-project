@@ -14,13 +14,13 @@ const TasksList = () => {
         let tasksList = [
             // create this fake tasks for now
             {
-                "id": "02b3ea35e0608daf7435",
+                "id": "1",
                 "title": "task 1",
                 "description": "",
                 "status": "ToDo"
             },
             {
-                "id": "02b3ea35e0608daf7436",
+                "id": "2",
                 "title": "task 2",
                 "description": "",
                 "status": "ToDo"
