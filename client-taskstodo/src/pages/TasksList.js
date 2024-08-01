@@ -1,9 +1,43 @@
-const TasksPage = () => {
+import { useEffect, useState } from "react";
+
+import TaskCard from "../components/TaskCard";
+
+
+// in this components we display the user's tasks
+// for this we call the API to get all tasks
+const TasksList = () => {
+    //  using React State with empty array for store tasks
+    const [tasks, setTasks] = useState([])
+
+    // when this component load useEffect hook make the request to the API
+    useEffect(() => {
+        let tasksList = [
+            // create this fake tasks for now
+            {
+                "id": "02b3ea35e0608daf7435",
+                "title": "task 1",
+                "description": "",
+                "status": "ToDo"
+            },
+            {
+                "id": "02b3ea35e0608daf7436",
+                "title": "task 2",
+                "description": "",
+                "status": "ToDo"
+            },
+        ];
+        // then set the http response to setTasks
+        setTasks(tasksList)
+
+    }, /* to just run once we do it like that --> */[]);
     return (
-        <div>
-            this is my tasks page (if the user is loged in, u can see)
-        </div>
+        <>
+            <div className="col mt-2">
+                {tasks.map((task) => (<TaskCard key={task.id} task={task} />)
+                )}
+            </div>
+        </>
     )
 }
 
-export default TasksPage;
+export default TasksList;
