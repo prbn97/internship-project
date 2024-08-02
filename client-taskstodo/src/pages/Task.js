@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 
 
 // in this components we display the task by id
@@ -9,16 +9,32 @@ const Task = () => {
     // using the hook useParams to make this happen
     let { id } = useParams(); // this variable needs to match with the :id in index.js
 
+    const { jwtToken } = useOutletContext();
+    const navigate = useNavigate();
     // 3ª useEffect to make the request
     useEffect(() => {
-        let taskById = {
-            "id": "1",
-            "title": "task 1",
-            "description": "some description",
-            "status": "ToDo",
+        if (!jwtToken) {
+            navigate("/login");
+            return;
+        } else {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+
+            const requestOptions = {
+                method: "GET",
+                headers: headers,
+            }; // get task by id
+            fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks/${id}`, requestOptions)
+                .then((response) => response.json())
+                .then((data) => {
+                    setTask(data);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+
         }
-        setTask(taskById)
-    }, [id]) // pass the id
+    }, [id, jwtToken, navigate]); // pass the id
 
     const getStatusBadgeClass = (status) => {
         switch (status) {
