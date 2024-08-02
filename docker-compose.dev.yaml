@@ -7,7 +7,7 @@ services:
     ports:
       - "3001:3000"
     volumes:
-      - ./front-taskstodo:/app
+      - ./client-taskstodo:/app
       - /app/node_modules
 
   backend:

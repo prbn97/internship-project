@@ -1,0 +1,20 @@
+{
+    "02b3ea35e0608daf7435": {
+        "id": "02b3ea35e0608daf7435",
+        "title": "Get ready for the summer!",
+        "description": "Go run every day, go to the gym, eat clean. Do all this before the summer arrive.",
+        "status": "ToDo"
+    },
+    "b8a92c708ed8ed59abd5": {
+        "id": "b8a92c708ed8ed59abd5",
+        "title": "Simply random task",
+        "description": "Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.",
+        "status": "Done"
+    },
+    "c134e5b48952380026fa": {
+        "id": "c134e5b48952380026fa",
+        "title": "Simply dummy task",
+        "description": "Simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+        "status": "Doing"
+    }
+}
