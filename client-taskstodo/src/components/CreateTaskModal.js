@@ -1,14 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 
 const CreateTaskModal = ({ show, onClose, onTaskCreated }) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [error, setError] = useState("");
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
+
+        if (!title.trim()) {
+            setError("Title cannot be empty.");
+            return;
+        }
+        setError("");
 
         const requestOptions = {
             method: "POST",
@@ -28,6 +35,13 @@ const CreateTaskModal = ({ show, onClose, onTaskCreated }) => {
             });
     };
 
+    // Clear error message when modal is closed
+    useEffect(() => {
+        if (!show) {
+            setError("");
+        }
+    }, [show]);
+
     return (
         <Modal show={show} onHide={onClose}>
             <Modal.Header closeButton>
@@ -44,7 +58,7 @@ const CreateTaskModal = ({ show, onClose, onTaskCreated }) => {
                             onChange={(e) => setTitle(e.target.value)}
                         />
                     </Form.Group>
-                    <Form.Group controlId="formTaskDescription">
+                    <Form.Group className="mb-3" controlId="formTaskDescription">
                         <Form.Label>Description</Form.Label>
                         <Form.Control
                             as="textarea"
@@ -54,6 +68,7 @@ const CreateTaskModal = ({ show, onClose, onTaskCreated }) => {
                             onChange={(e) => setDescription(e.target.value)}
                         />
                     </Form.Group>
+                    {error && <div className="alert alert-danger">{error}</div>}
                     <Button variant="primary" type="submit">
                         Create Task
                     </Button>
