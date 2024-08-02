@@ -9,9 +9,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 const TasksList = () => {
     //  using React State with empty array for store tasks
     const [tasks, setTasks] = useState([])
-
-
-    const { jwtToken } = useOutletContext();
+    const { jwtToken, setAlertClassName, setAlertMessage } = useOutletContext()
     const navigate = useNavigate();
 
     // when this component load useEffect hook make the request to the API
@@ -33,13 +31,17 @@ const TasksList = () => {
                 .then((response) => response.json())
                 .then((data) => {
                     setTasks(data);
+                    setAlertClassName("d-none")
+                    setAlertMessage("")
                 })
                 .catch(err => {
                     console.log(err);
+                    setAlertClassName("alert-danger")
+                    setAlertMessage("internal server error")
                 });
 
         };
-    }, [jwtToken, navigate]);
+    }, [jwtToken, navigate, setAlertClassName, setAlertMessage]);
 
     return (
         <>
