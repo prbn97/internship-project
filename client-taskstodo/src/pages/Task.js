@@ -1,3 +1,6 @@
+import deleteIcon from '../img/delete.svg';
+import DeleteTaskModal from '../components/DeleteTaskModal';
+
 import { useEffect, useState } from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 
@@ -72,18 +75,54 @@ const Task = () => {
             });
     };
 
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+    const handleDelete = () => {
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+
+        const requestOptions = {
+            method: "DELETE",
+            headers: headers,
+        };
+
+        fetch(`${process.env.REACT_APP_BACKEND_ADDRESS}/tasks/${id}`, requestOptions)
+            .then((response) => {
+                if (response.ok) {
+                    navigate("/tasks");
+                } else {
+                    throw new Error("Failed to delete task");
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                setAlertClassName("alert-danger");
+                setAlertMessage("Failed to delete task");
+            });
+        setShowDeleteModal(false);
+    };
+
     return (
-        <div className="card mt-3" style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}
-        >
+        <div className="card mt-3" style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
             <div className="card-body">
                 <h5 className="card-title">{task.title}</h5>
                 <p className="card-text">{task.description}</p>
-                <div className="mb-3">
+                <div className="d-flex justify-content-between">
                     <button
                         className={`btn ${getStatusBadgeClass(task.status)} cursor-pointer`}
                         onClick={handleStatusClick}> Status: {task.status}
                     </button>
+                    <img
+                        alt="delete-task-icon" src={deleteIcon}
+                        width="30" height="30" className="ms-5 cursor-pointer"
+                        onClick={() => setShowDeleteModal(true)}
+                    />
                 </div>
+                <DeleteTaskModal
+                    show={showDeleteModal}
+                    handleClose={() => setShowDeleteModal(false)}
+                    handleDelete={handleDelete}
+                />
             </div>
         </div>
     )
