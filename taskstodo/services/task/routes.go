@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/prbn97/internship-project/types"
-	"github.com/prbn97/internship-project/utils"
+	types "github.com/prbn97/internship-project/services/models"
+	"github.com/prbn97/internship-project/services/utils"
 )
 
 type Handler struct {

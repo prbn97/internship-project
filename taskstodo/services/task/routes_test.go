@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/prbn97/internship-project/types"
+	types "github.com/prbn97/internship-project/services/models"
 )
 
 func TestTaskHandlers(t *testing.T) {
